@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/14 20:21:47 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/14 21:29:47 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/14 21:45:02 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,10 @@ typedef struct s_pos{
 }t_pos;
 
 typedef struct s_mdata{
-	
+
 }t_mdata;
+
+#define BUFSIZ 8192
 
 //int	wall_len(char *map)
 //{
@@ -191,6 +193,65 @@ typedef struct s_mdata{
 //	return (free(map), close(data->mp.fd), 1);
 //}
 
+static char	*ft_word_cpy(char const *s, char c)
+{
+	char	*word_cpy;
+	int		word_len;
+	int		index;
+
+	word_len = 0;
+	while (s[word_len] != c && s[word_len])
+		word_len++;
+	word_cpy = (char *)malloc(word_len + 1);
+	index = 0;
+	while (index < word_len)
+	{
+		word_cpy[index] = *s++;
+		index++;
+	}
+	word_cpy[index] = '\0';
+	return (word_cpy);
+}
+
+static int	ft_word_count(char const *s, char c)
+{
+	int	word_count;
+
+	word_count = 0;
+	while (*s)
+	{
+		while (*s == c && *s)
+			s++;
+		if (!*s)
+			return (word_count);
+		word_count++;
+		while (*s != c && *s)
+			s++;
+	}
+	return (word_count);
+}
+
+char	**ft_split(char const *s, char c)
+{
+	char	**split;
+	int		index;
+
+	index = 0;
+	split = (char **)ft_calloc((ft_word_count(s, c) + 1), sizeof(char *));
+	if (!split)
+		return (NULL);
+	while (*s)
+	{
+		while (*s == c && *s)
+			s++;
+		if (*s)
+			split[index] = ft_word_cpy(s, c);
+		index++;
+		while (*s != c && *s)
+			s++;
+	}
+	return (split);
+}
 
 //modified libft functions 
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
@@ -225,11 +286,25 @@ bool	err_msg(const char *msg)
 	return (false);
 }
 
-bool	map_parse(int fd, const char *file_name)
+bool	map_parse(char *buf, const char *file_name)
 {
+	if (pre_check())
+	
 	if (ft_strncmp(ft_strchr(file_name, '.'), ".cub", 5))
 		return (err_msg("Bad extension"));
-	
+
+	return (false);
+}
+
+char** read_map(int fd)
+{
+	char	buf[BUFSIZ];
+	char**	split;
+
+	while (read(fd, buf, BUFSIZ))
+	{
+		
+	}
 }
 
 int	main(void)
@@ -239,6 +314,7 @@ int	main(void)
 
 	file_name = "Map.cub";
 	fd = open(file_name, O_RDONLY);
+	
 	if (map_parse(fd, file_name))
 		printf("good Map\n");
 	else
