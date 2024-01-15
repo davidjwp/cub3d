@@ -6,318 +6,185 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/14 20:21:47 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/14 21:45:02 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/15 23:42:44 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <stdbool.h>
-#include "libft/libft.h"
+#include "cub3d.h"
 
-typedef struct s_pos{
-	int	x;
-	int	y;
-}t_pos;
+//gcc -g3 -Wall -Werror -Wextra Parser.c utils.c -L -llibft libft/libft.a
+/*
+*	Checks for spaces and tabs before the textures and colors then trims tabs
+*	and spaces off the end of the string.
+*
+*	Returns a boolean value
+*/
+bool	trim(t_mdata *md)
+{
+	void	*tmp;
+	int		i;
 
-typedef struct s_mdata{
+	i = -1;
+	while (md->tex[++i] != NULL)
+		if (*md->tex[i] == ' ' || *md->tex[i] == '\t')
+			return (false);
+	i = 0;
+	while (md->tex[i] != NULL)
+	{
+		tmp = md->tex[i];
+		md->tex[i] = ft_strtrim((md->tex[i]), " \t");
+		if (!md->tex[i])
+			return (md->tex[i] = tmp, err_msg("trim malloc fail"), false);
+		free(tmp);
+		i++;
+	}
+	return (true);
+}
 
-}t_mdata;
+bool	is_texcol(int pos, t_mdata *fdata)
+{
+	int	i;
 
-#define BUFSIZ 8192
-
-//int	wall_len(char *map)
-//{
-//	int	i;
-
-//	i = 0;
-//	while (map[i] && map[i] != '\n' )
-//		i++;
-//	return (i);
-//}
-
-//int	map_clean(char **map, int i, int n)
-//{
-//	char	*mapcpy;
-
-//	mapcpy = malloc(sizeof(char) * BUFSIZ);
-//	if (mapcpy == NULL)
-//		return (err_msg("map_clean malloc fail"), 0);
-//	while (map[0][i] != 'P' && map[0][i])
-//		i++;
-//	if (!map[0][i])
-//		return (err_msg("no player"), free(mapcpy), 0);
-//	while ((map[0][i] != '\n' || map[0][i - 1] != '\n') && (*map != NULL && i))
-//		i--;
-//	while ((((map[0][i] != '\n' || map[0][i + 1] != '\n') && (map[0][i] != '\n' \
-//	|| map[0][i + 1] != 0)) && map[0][i] && *map != NULL))
-//	{
-//		if (map[0][i] == '\n' && !n)
-//			i++;
-//		mapcpy[n] = map[0][i];
-//		n++;
-//		i++;
-//	}
-//	mapcpy[n] = 0;
-//	*map = mapcpy;
-//	return (1);
-//}
-
-//int	map_shape(char **map, int i, int n)
-//{
-//	int	flen;
-
-//	if (!map_clean(map, 0, 0))
-//		return (*map = NULL, 0);
-//	flen = wall_len(*map);
-//	while (map[0][i] != 0)
-//	{
-//		if (map[0][i] != '\n')
-//			n++;
-//		else
-//			n = 0;
-//		i++;
-//		if ((map[0][i] == '\n' || !map[0][i]) && n != flen)
-//		{
-//			free(*map);
-//			*map = NULL;
-//			break ;
-//		}
-//	}
-//	if (*map == NULL)
-//		return (err_msg("bad map shape"), 0);
-//	return (1);
-//}
-
-
-//t_pos	get_map_lw(char	**map)
-//{
-//	int	x;
-//	int	y;
-
-//	x = 0;
-//	y = 0;
-//	while (map[y] != NULL)
-//		y++;
-//	while (map[0][x] != 0)
-//		x++;
-//	return ((t_pos){y, x});
-//}
-
-//int	is_map(char c)
-//{
-//	if (c == '0' || c == '1' || c == 'C' || c == 'P' || c == 'E' || c == '\n')
-//		return (1);
-//	return (0);
-//}
-
-/*check for proper walls*/
-//int	map_walls(char **map, t_pos pos, int y, int x)
-//{
-//	if (pos.y == pos.x)
-//		return (err_msg("map is square"), 0);
-//	while (x < pos.x)
-//	{
-//		if (map[0][x] != '1' || map[pos.y - 1][x] != '1')
-//			return (err_msg("broken walls on top/bottom"), 0);
-//		x++;
-//	}
-//	while (y < pos.y)
-//	{
-//		if (map[y][0] != '1' || map[y][pos.x - 1] != '1')
-//			return (err_msg("broken walls on left/right"), 0);
-//		y++;
-//	}
-//	return (1);
-//}
-
-/*check for missing element*/
-//int	map_check(t_map *MapCheck, char *map, char **map_split)
-//{
-//	int	i;
-
-//	i = 0;
-//	while (map[i] != 0)
-//	{
-//		if (!is_map(map[i]))
-//			return (err_msg("bad character"), 0);
-//		if (map[i] == 'C')
-//			MapCheck->items++;
-//		else if (map[i] == 'E')
-//			MapCheck->exit++;
-//		else if (map[i] == 'P')
-//			MapCheck->character++;
-//		i++;
-//	}
-//	if ((MapCheck->exit != 1) || (MapCheck->character > 1 || \
-//	!MapCheck->character) || MapCheck->items < 1)
-//		return (err_msg("bad item or character or exit"), 0);
-//	if (!map_walls(map_split, get_map_lw(map_split), 0, 0))
-//		return (0);
-//	return (1);
-//}
+	i = -1;
+	while (++i < 6)
+		if (pos == fdata->tc_index[i])
+			return (true);
+	return (false);
+}
 
 /*
-*	this function checks for the proper extension, that the files exists
-*	then it'll check all the elements, for proper shape, that there is no hole
-*	or that there is no stray walls, then it checks for the length and width
-*	so that the map isn't too big
+*	finds the map using the character placement
 */
-//int	map_parse(t_xdata *data, char *file)
-//{
-//	char	*map;
+t_pos	find_map(t_mdata *fdata)
+{
+	t_pos	p;
 
-//	if (!ber_file(file, ".ber"))
-//		return (err_msg("wrong file type"), 0);
-//	data->mp = (t_map){0, 0, 0, 0, {0, 0, 0, 0}};
-//	data->mp.fd = open(file, 0);
-//	if (data->mp.fd < 0)
-//		return (err_msg("no fd"), 0);
-//	gnl(data->mp.fd, &map, 0, 0);
-//	if (map == NULL)
-//		return (close(data->mp.fd), 0);
-//	data->map = ft_split(map, '\n');
-//	if (data->map == NULL)
-//		return (close(data->mp.fd), 0);
-//	if (!map_check(&data->mp, map, data->map))
-//		return (free(map), close(data->mp.fd), free_split(data->map), 0);
-//	data->win_wl = get_map_lw(data->map);
-//	if (data->win_wl.x >= 64 || data->win_wl.y >= 42)
-//		return (err_msg("map too big"), free(map), \
-//		free_split(data->map), close(data->mp.fd), 0);
-//	if (!a_star(data->map, (t_star){get_pos(data->map, 'P'), \
-//	get_pos(data->map, 'E'), data->win_wl, 0, 0, 0, data->mp.items}))
-//		return (free(map), free_split(data->map), close(data->mp.fd), 0);
-//	data->player.pos = get_pos(data->map, 'P');
-//	return (free(map), close(data->mp.fd), 1);
+	p = (t_pos){-1, -1};
+	while (fdata->map[++p.x])
+		while (fdata->map[p.x][++p.y])
+			if (ischar(fdata->map[p.x][p.y]) && !is_texcol(p.x, fdata))
+				break ;
+	while (fdata->map[p.x][p.y++])
+	{
+		if (ismap(fdata->map[p.x][p.y]))
+		{
+			p.x--;
+			p.y = 0;
+		}
+		else
+			break ;
+	}
+	return ((t_pos){p.x, 0});
+}
+
+bool	get_texcol(int *pos, char *map, char **tex)
+{
+	*pos = 0;
+	while (tex[*pos] != NULL)
+	{
+		if (!ft_strncmp(map, tex[*pos], ft_strlen(tex[*pos])))
+			return (true);
+		*pos += 1;
+	}
+	return (false);
+}
+
+bool	is_full(char **map)
+{
+	int	i;
+
+	i = 0;
+	while (map[i] != NULL && *map[i])
+		if (++i == 6)
+			return (true);
+	return (false);
+}
+
+//this isn't working, the colors and textures can be in any order 
+bool	texcol_check(char **map, t_mdata *fd, int i, int y)
+{
+	char	*tex[5];
+	int		pos;
+
+	while (++i < 7)
+		tex[i] = (char *[7]){"NO ./", "SO ./", "WE ./", "EA ./", "F ", \
+		"C ", NULL}[i];
+	y = 0;
+	while (map[y])
+	{
+		if (!is_full(fd->tex) && get_texcol(&pos, map[y], tex) && pos <= 3)
+			ft_strlcpy(fd->tex[pos], ft_strchr(map[y], '/') + 1, \
+			ft_strlen(ft_strchr(map[y], '/') + 1) + 1);
+		if (!is_full(fd->tex) && get_texcol(&pos, map[y], tex) && pos > 3)
+			ft_strlcpy(fd->tex[pos], ft_strchr(map[y], ' ') + 1, \
+			ft_strlen(ft_strchr(map[y], ' ') + 1) + 1);
+		y++;
+	}
+	if (is_full(fd->tex))
+		return (trim(fd));
+	return (false);
+}
+
+//bool	cr_map(t_mdata *fdata, t_pos p)
+//{
+//	char	**tmp;
+
+//	while (l_ismap(fdata->map[p.x]))
+//		p.x--;
+//	p.x++;
+//	while (l_ismap(fdata->map[p.x]))
+//	{
+		
+//	}
 //}
 
-static char	*ft_word_cpy(char const *s, char c)
+bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
 {
-	char	*word_cpy;
-	int		word_len;
-	int		index;
-
-	word_len = 0;
-	while (s[word_len] != c && s[word_len])
-		word_len++;
-	word_cpy = (char *)malloc(word_len + 1);
-	index = 0;
-	while (index < word_len)
-	{
-		word_cpy[index] = *s++;
-		index++;
-	}
-	word_cpy[index] = '\0';
-	return (word_cpy);
-}
-
-static int	ft_word_count(char const *s, char c)
-{
-	int	word_count;
-
-	word_count = 0;
-	while (*s)
-	{
-		while (*s == c && *s)
-			s++;
-		if (!*s)
-			return (word_count);
-		word_count++;
-		while (*s != c && *s)
-			s++;
-	}
-	return (word_count);
-}
-
-char	**ft_split(char const *s, char c)
-{
-	char	**split;
-	int		index;
-
-	index = 0;
-	split = (char **)ft_calloc((ft_word_count(s, c) + 1), sizeof(char *));
-	if (!split)
-		return (NULL);
-	while (*s)
-	{
-		while (*s == c && *s)
-			s++;
-		if (*s)
-			split[index] = ft_word_cpy(s, c);
-		index++;
-		while (*s != c && *s)
-			s++;
-	}
-	return (split);
-}
-
-//modified libft functions 
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
-{
-	if (!n || !s1 || !s2)
-		return (1);
-	while (*s1 == *s2 && n - 1)
-	{
-		s1++;
-		s2++;
-		n--;
-	}
-	if ((*s1 - *s2) == -128)
-		return (-1);
-	return (*s1 - *s2);
-}
-
-char	*ft_strchr(const char *s, int c)
-{
-	while (*s != (char)c)
-	{
-		s++;
-		if (!*s && c != 0)
-			return (0);
-	}
-	return ((char *)s);
-}
-
-bool	err_msg(const char *msg)
-{
-	printf("Error: %s\n", msg);
-	return (false);
-}
-
-bool	map_parse(char *buf, const char *file_name)
-{
-	if (pre_check())
-	
+	if (split == NULL)
+		return (err_msg("split fail"));
+	fdata->map = split;
 	if (ft_strncmp(ft_strchr(file_name, '.'), ".cub", 5))
 		return (err_msg("Bad extension"));
-
-	return (false);
-}
-
-char** read_map(int fd)
-{
-	char	buf[BUFSIZ];
-	char**	split;
-
-	while (read(fd, buf, BUFSIZ))
-	{
-		
-	}
+	if (!texcol_check(fdata->map, fdata, -1, 0))
+		return (err_msg("Bad texcol"));
+	//if (!cr_map(fdata, (t_pos){0, 0}))
+	//	return (false);
+	return (true);
 }
 
 int	main(void)
 {
-	int			fd;
+	t_mdata		fdata;
 	const char	*file_name;
+	int			fd;
+	char		*buf;
 
+	/*			initialization			*/
+	fdata = (t_mdata){NULL, NULL, {0, 0, 0, 0, 0, 0}};
+	fdata.tex = malloc(sizeof(char *) * 7);
+	if (!fdata.tex)
+		return (err_msg("malloc fail"), -1);
+	for (int i = 0; i < 6; i++){
+		fdata.tex[i] = malloc(sizeof(char) * BUF_SIZ);
+		if (!fdata.tex[i])
+			return (err_msg("malloc fail"), free_split(fdata.tex, i), -1);
+		*fdata.tex[i] = 0;
+	}
+	fdata.tex[6] = NULL;
 	file_name = "Map.cub";
 	fd = open(file_name, O_RDONLY);
-	
-	if (map_parse(fd, file_name))
+	if (fd == -1)
+		return (err_msg("open fail"), 1);
+	if (gnl(fd, &buf, 0, 0))
+		return (err_msg("gnl error"), close(fd), 2);
+	if (buf == NULL)
+		return (err_msg("gnl fail"), close(fd), 3);
+	/*			parsing					*/
+	if (file_parse(ft_split(buf, '\n'), file_name, &fdata))
 		printf("good Map\n");
 	else
 		printf("bad Map\n");
+	/*			cleaning up				*/
+	clean_all(buf, fdata, fd);
 	return (0);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strtrim.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: djacobs <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 20:05:59 by djacobs           #+#    #+#             */
-/*   Updated: 2022/11/30 13:20:43 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/15 19:23:24 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ static int	is_set(char const s, char const *set)
 	return (0);
 }
 
+//modified
 char	*ft_strtrim(char const *s1, char const *set)
 {
 	char			*trim;
@@ -41,6 +42,8 @@ char	*ft_strtrim(char const *s1, char const *set)
 			length--;
 	}
 	trim = (char *)malloc(sizeof(char) * (length + 1));
+	if (!trim)
+		return (NULL);
 	while (length--)
 		trim[index++] = *s1++;
 	trim[index] = 0;

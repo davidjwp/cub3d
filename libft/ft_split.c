@@ -3,14 +3,33 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: djacobs <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/16 12:34:25 by djacobs           #+#    #+#             */
-/*   Updated: 2022/11/30 19:14:49 by djacobs          ###   ########.fr       */
+/*   Created: 2024/01/15 16:31:10 by djacobs           #+#    #+#             */
+/*   Updated: 2024/01/15 18:11:15 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+
+//modified split added security
+void	free_split(char **split, int index)
+{
+	if (!index)
+	{
+		while (split[index] != NULL)
+			free(split[index++]);
+	}
+	else
+	{
+		while (index)
+		{
+			free(split[index]);
+			index--;
+		}	
+	}
+	free(split);
+}
 
 static char	*ft_word_cpy(char const *s, char c)
 {
@@ -64,7 +83,11 @@ char	**ft_split(char const *s, char c)
 		while (*s == c && *s)
 			s++;
 		if (*s)
+		{
 			split[index] = ft_word_cpy(s, c);
+			if (!split[index])
+				return (free_split(split, index), NULL);
+		}
 		index++;
 		while (*s != c && *s)
 			s++;
