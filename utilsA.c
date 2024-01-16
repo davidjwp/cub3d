@@ -6,11 +6,20 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 14:26:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/16 14:27:36 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/16 18:51:49 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
+
+/*
+	0 is empty
+	1 is a wall
+	N is the player facing North
+	S is the player facing South
+	E is the player facing East
+	W is the player facing West
+*/
 
 bool	ismap(char c)
 {
@@ -28,13 +37,21 @@ bool	ischar(char c)
 
 bool	l_ismap(char *l)
 {
-	int	i;
+	bool	s;
+	int		i;
 
+	s = false;
 	i = -1;
+	if (!l)
+		return (false);
 	while (l[++i])
+	{
 		if (ismap(l[i]))
-			return (true);
-	return (false);
+			s = true;
+		if (!ismap(l[i]) && (!s && (l[i] == 32 || l[i] == 9)))
+			return (false);
+	}
+	return (true);
 }
 
 bool	err_msg(const char *msg)

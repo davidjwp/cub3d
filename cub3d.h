@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 13:58:28 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/16 14:20:01 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/16 16:44:29 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void	clean_all(char *buf, t_mdata mdata, int fd);
 /*		UtilsB			*/
 int		gnl(int fd, char **str, int i, int n);
 bool	is_texcol(int pos, t_mdata *fdata);
-t_pos	find_map(t_mdata *fdata);
+int		find_map(t_mdata *fdata, t_pos *p);
 bool	is_full(char **map);
 
 #endif

@@ -6,13 +6,13 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/14 20:21:47 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/16 14:23:50 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/16 18:43:41 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-//gcc -g3 -Wall -Werror -Wextra Parser.c utils.c -L -llibft libft/libft.a
+//gcc -g3 -Wall -Werror -Wextra Parser.c utilsA.c utilsB.c -L -llibft libft/libft.a
 /*
 *	Checks for spaces and tabs before the textures and colors then trims tabs
 *	and spaces off the end of the string.
@@ -58,7 +58,6 @@ bool	texcol_check(t_mdata *fd, int i, int y)
 	char	*tex[5];
 	int		pos;
 
-	printf("HERE\n");
 	while (++i < 7)
 		tex[i] = (char *[7]){"NO ./", "SO ./", "WE ./", "EA ./", "F ", \
 		"C ", NULL}[i];
@@ -78,25 +77,31 @@ bool	texcol_check(t_mdata *fd, int i, int y)
 	return (false);
 }
 
+bool	cr_map(t_mdata *fdata, t_pos p)
+{
+	char	**tmp;
+	int		len;
+	int		i;
 
-//bool	cr_map(t_mdata *fdata, t_pos p)
-//{
-//	while (fdata->map[p.y])
-//	{
-//		while (fdata->map[p.y][p.x])
-//			if (ischar(fdata->map[p.y][p.x++]) && !is_texcol(p.y, fdata))
-//		p.x = 0;
-//		p.y++;
-//	}
-
-
-
-//	while (l_ismap(fdata->map[p.x]))
-//		p.x--;
-//	p.x++;
-//	while (l_ismap(fdata->map[p.x]))
-//		p.x--;
-//}
+	i = -1;
+	len = find_map(fdata, &p);
+	if (p.x < 0 || p.y < 0)
+		return (false);
+	tmp = malloc(sizeof(char *) * len);
+	if (!tmp)
+		return (err_msg("cr_map malloc fail"));
+	tmp[len - 1] = NULL;
+	while (l_ismap(fdata->map[++p.y]))
+	{
+		tmp[++i] = malloc(sizeof(char) * (BUF_SIZ / 2));
+		if (!tmp[i])
+			return (free_split(tmp, i), err_msg("cr_map malloc fail"));
+		ft_strlcpy(tmp[i], fdata->map[p.y], BUF_SIZ);
+	}
+	free_split(fdata->map, 0);
+	fdata->map = tmp;
+	return (true);
+}
 
 bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
 {
@@ -107,8 +112,8 @@ bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
 		return (err_msg("Bad extension"));
 	if (!texcol_check(fdata, -1, 0))
 		return (err_msg("Bad texcol"));
-	//if (!cr_map(fdata, (t_pos){0, 0}))
-	//	return (false);
+	if (!cr_map(fdata, (t_pos){-1, -1}))
+		return (false);
 	return (true);
 }
 

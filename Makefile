@@ -6,47 +6,42 @@
 #    By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/16 14:07:50 by djacobs           #+#    #+#              #
-#    Updated: 2024/01/16 14:17:20 by djacobs          ###   ########.fr        #
+#    Updated: 2024/01/16 17:39:26 by djacobs          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME		= test
+NAME		:= test
+CC			:= gcc
+CFLAGS		:= -g3 -Wall -Werror -Wextra
 
-CC			= cc
+HEADER		:= cub3d.h
 
-CFLAGS		= -Wall -Werror -Wextra
+LINKER		:= -L -llibft
+LIBFT_DIR	:= libft
+LIBFT		:= $(LIBFT_DIR)/libft.a
 
-HEADER		= cub3d.h
+SRCS		:= Parser.c utilsA.c utilsB.c
+OBJS		:= $(SRCS:.c=.o)
 
-LIB			= libft/libft.a
+all: $(NAME)
 
-SRCS		=	Parser.c \
-				utilsA.c \
-				utilsB.c \
+$(NAME): $(OBJS) $(LIBFT)
+	$(CC) $(CFLAGS) $(OBJS) $(LINKER) $(LIBFT) -o $(NAME)
 
-OBJS_DIR	= objs/
-OBJS		= $(SRCS:srcs/%.c=$(OBJS_DIR)%.o)
+%.o: %.c $(HEADER)
+	$(CC) $(CFLAGS) -I$(LIBFT_DIR) -c $< -o $@
 
-all:$(NAME)
-
-$(NAME): $(LIB) $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(LIB) -o $(NAME)
-
-$(OBJS_DIR)%.o: srcs/%.c
-	@mkdir -p $(@D)
-	@$(CC) -c $(CFLAGS) $< -o $@
-
-$(LIB):
-	@make -s -C libft/
+$(LIBFT):
+	make -C $(LIBFT_DIR)
 
 clean:
-	@rm -f $(OBJS)
-	@make clean -C libft/
-	
+	rm -f $(OBJS)
+	make -C $(LIBFT_DIR) clean
+
 fclean: clean
-	@rm -f $(NAME)
-	@make -s fclean -C libft/ 
+	rm -f $(NAME)
+	make -C $(LIBFT_DIR) fclean
 
 re: fclean all
 
-.PHONY: fclean clean all
+.PHONY: all clean fclean re

@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 14:03:39 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/16 14:26:04 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/16 18:56:51 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,29 +52,41 @@ bool	is_texcol(int pos, t_mdata *fdata)
 	return (false);
 }
 
+bool	find_char(t_mdata *fdata, t_pos *p)
+{
+	while (fdata->map[++p->y] != NULL)
+	{
+		while (fdata->map[p->y][++p->x])
+			if (ischar(fdata->map[p->y][p->x]) && !is_texcol(p->y, fdata))
+				return (true);
+		p->x = -1;
+	}
+	return (false);
+}
+
 /*
 *	finds the map using the character placement
 */
-t_pos	find_map(t_mdata *fdata)
+int	find_map(t_mdata *fdata, t_pos *p)
 {
-	t_pos	p;
+	int		len;
 
-	p = (t_pos){-1, -1};
-	while (fdata->map[++p.x])
-		while (fdata->map[p.x][++p.y])
-			if (ischar(fdata->map[p.x][p.y]) && !is_texcol(p.x, fdata))
-				break ;
-	while (fdata->map[p.x][p.y++])
+	if (!find_char(fdata, p))
+		return (-1);
+	len = p->y;
+	while (l_ismap(fdata->map[len]))
+		len++;
+	while (fdata->map[p->y][++p->x])
 	{
-		if (ismap(fdata->map[p.x][p.y]))
+		if (l_ismap(fdata->map[p->y]))
 		{
-			p.x--;
-			p.y = 0;
+			p->y--;
+			p->x = -1;
 		}
 		else
 			break ;
 	}
-	return ((t_pos){p.x, 0});
+	return (len - p->y);
 }
 
 bool	is_full(char **map)
