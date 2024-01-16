@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/14 20:21:47 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/16 18:43:41 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/16 21:46:32 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,31 +77,83 @@ bool	texcol_check(t_mdata *fd, int i, int y)
 	return (false);
 }
 
-bool	cr_map(t_mdata *fdata, t_pos p)
+int	find_highest(int *index)
+{
+	int	highest;
+	int	y;
+	int	i;
+
+	y = -1;
+	i = -1;
+	highest = 0;
+	while (++y < 2)
+		while (++i < 6)
+			if (index[i] > highest)
+				highest = index[i];
+	return (highest);
+}
+
+//start searching the map from the position of the last color of texture
+bool	cr_map(t_mdata *fdata)
 {
 	char	**tmp;
-	int		len;
-	int		i;
 
-	i = -1;
-	len = find_map(fdata, &p);
-	if (p.x < 0 || p.y < 0)
-		return (false);
-	tmp = malloc(sizeof(char *) * len);
+	tmp = ft_split(&fdata->map[find_highest(fdata->tc_index) + 1], '\n');
 	if (!tmp)
-		return (err_msg("cr_map malloc fail"));
-	tmp[len - 1] = NULL;
-	while (l_ismap(fdata->map[++p.y]))
-	{
-		tmp[++i] = malloc(sizeof(char) * (BUF_SIZ / 2));
-		if (!tmp[i])
-			return (free_split(tmp, i), err_msg("cr_map malloc fail"));
-		ft_strlcpy(tmp[i], fdata->map[p.y], BUF_SIZ);
-	}
-	free_split(fdata->map, 0);
-	fdata->map = tmp;
-	return (true);
+		return (err_msg("split fail"));
+	while 
 }
+
+//bool	cr_map(t_mdata *fdata, t_pos p)
+//{
+//	char	**tmp;
+//	int		len;
+//	int		i;
+
+//	i = -1;
+//	len = find_map(fdata, &p);
+//	if (p.x < 0 || p.y < 0 || len < 0)
+//		return (false);
+//	tmp = malloc(sizeof(char *) * len);
+//	if (!tmp)
+//		return (err_msg("cr_map malloc fail"));
+//	tmp[len - 1] = NULL;
+//	while (l_ismap(fdata->map[++p.y]))
+//	{
+//		tmp[++i] = malloc(sizeof(char) * (BUF_SIZ / 2));
+//		if (!tmp[i])
+//			return (free_split(tmp, i), err_msg("cr_map malloc fail"));
+//		ft_strlcpy(tmp[i], fdata->map[p.y], BUF_SIZ);
+//	}
+//	free_split(fdata->map, 0);
+//	fdata->map = tmp;
+//	return (true);
+//}
+
+//test function
+void	print_map(t_mdata *fdata)
+{
+	t_pos	p = {-1, -1};
+
+	while (fdata->map[++p.y]){
+		while (fdata->map[p.y][++p.x])
+			write (1, &fdata->map[p.y][p.x],1);
+		write (1, "\n",1);
+		p.x = 0;
+	}
+}
+
+//bool	map_check(t_mdata *fdata)
+//{
+//	t_pos	p;
+
+//	p = (t_pos){-1, -1};
+//	while (fdata->map[++p.y])
+//		while (fdata->map[p.y][++p.x])
+//			if (ismap())
+
+//	return (true);
+//}
 
 bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
 {
@@ -114,6 +166,9 @@ bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
 		return (err_msg("Bad texcol"));
 	if (!cr_map(fdata, (t_pos){-1, -1}))
 		return (false);
+	print_map(fdata);
+	//if (!map_check(fdata))
+	//	return (err_msg("map_check fail"));
 	return (true);
 }
 

@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 14:03:39 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/16 18:56:51 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/16 19:53:26 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,9 @@ bool	find_char(t_mdata *fdata, t_pos *p)
 int	find_map(t_mdata *fdata, t_pos *p)
 {
 	int		len;
+	int		i;
 
+	i = -1;
 	if (!find_char(fdata, p))
 		return (-1);
 	len = p->y;
@@ -86,6 +88,9 @@ int	find_map(t_mdata *fdata, t_pos *p)
 		else
 			break ;
 	}
+	while (++i < 6)
+		if (fdata->tc_index[i] > p->y + 1)
+			return (err_msg("Wrong texture placement"), -1);
 	return (len - p->y);
 }
 

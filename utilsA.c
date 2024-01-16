@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 14:26:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/16 18:51:49 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/16 20:55:14 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,24 +35,44 @@ bool	ischar(char c)
 	return (false);
 }
 
+//bool	l_ismap(char *l)
+//{
+//	bool	s;
+//	int		i;
+
+//	s = false;
+//	if (!l)
+//		return (false);
+//	i = -1;
+//	while (l[++i])
+//	{
+//		if (ismap(l[i]))
+//			s = true;
+//		while (l[i] == 32 || l[i] == 9)
+//			i++;
+//		if (!ismap(l[i]) && !s && !l[i])
+//			return (false);
+//	}
+//	return (true);
+//}
+
 bool	l_ismap(char *l)
 {
-	bool	s;
 	int		i;
 
-	s = false;
-	i = -1;
 	if (!l)
 		return (false);
+	i = -1;
 	while (l[++i])
 	{
-		if (ismap(l[i]))
-			s = true;
-		if (!ismap(l[i]) && (!s && (l[i] == 32 || l[i] == 9)))
+		while (l[i] == 32 || l[i] == 9)
+			i++;
+		if (!ismap(l[i]))
 			return (false);
 	}
 	return (true);
 }
+
 
 bool	err_msg(const char *msg)
 {
