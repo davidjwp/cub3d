@@ -1,25 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   utilsA.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/15 13:56:59 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/16 14:03:52 by djacobs          ###   ########.fr       */
+/*   Created: 2024/01/16 14:26:29 by djacobs           #+#    #+#             */
+/*   Updated: 2024/01/16 14:27:36 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-/*
-	0 is empty
-	1 is a wall
-	N is the player facing North
-	S is the player facing South
-	E is the player facing East
-	W is the player facing West
-*/
 
 bool	ismap(char c)
 {
@@ -60,33 +51,4 @@ void	clean_all(char *buf, t_mdata mdata, int fd)
 	free_split(mdata.map, 0);
 	free_split(mdata.tex, 0);
 	close(fd);
-}
-
-int	gnl(int fd, char **str, int i, int n)
-{
-	char	*buf;
-	char	c;
-
-	buf = malloc(sizeof(char) * BUF_SIZ);
-	if (buf == NULL)
-		return (*str = NULL, 1);
-	n = read(fd, &c, 1);
-	if (n == 0 || n == -1)
-		return (free(buf), err_msg("gnl read fail"), *str = NULL, 2);
-	while (c == '\n')
-		n = read(fd, &c, 1);
-	if (n)
-		buf[i++] = c;
-	while (n && c != 0)
-	{
-		n = read(fd, &c, 1);
-		if (i == BUF_SIZ - 1)
-			break ;
-		if (n != 0)
-			buf[i] = c;
-		i++;
-	}
-	buf[i - 1] = 0;
-	buf[BUF_SIZ - 1] = 0;
-	return (*str = buf, 0);
 }

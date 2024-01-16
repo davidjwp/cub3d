@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/14 20:21:47 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/15 23:42:44 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/16 14:23:50 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,83 +41,36 @@ bool	trim(t_mdata *md)
 	return (true);
 }
 
-bool	is_texcol(int pos, t_mdata *fdata)
-{
-	int	i;
-
-	i = -1;
-	while (++i < 6)
-		if (pos == fdata->tc_index[i])
-			return (true);
-	return (false);
-}
-
-/*
-*	finds the map using the character placement
-*/
-t_pos	find_map(t_mdata *fdata)
-{
-	t_pos	p;
-
-	p = (t_pos){-1, -1};
-	while (fdata->map[++p.x])
-		while (fdata->map[p.x][++p.y])
-			if (ischar(fdata->map[p.x][p.y]) && !is_texcol(p.x, fdata))
-				break ;
-	while (fdata->map[p.x][p.y++])
-	{
-		if (ismap(fdata->map[p.x][p.y]))
-		{
-			p.x--;
-			p.y = 0;
-		}
-		else
-			break ;
-	}
-	return ((t_pos){p.x, 0});
-}
-
-bool	get_texcol(int *pos, char *map, char **tex)
+bool	texcol(int *pos, t_mdata *fd, int y, char **tex)
 {
 	*pos = 0;
 	while (tex[*pos] != NULL)
 	{
-		if (!ft_strncmp(map, tex[*pos], ft_strlen(tex[*pos])))
-			return (true);
+		if (!ft_strncmp(fd->map[y], tex[*pos], ft_strlen(tex[*pos])))
+			return (fd->tc_index[*pos] = y, true);
 		*pos += 1;
 	}
 	return (false);
 }
 
-bool	is_full(char **map)
-{
-	int	i;
-
-	i = 0;
-	while (map[i] != NULL && *map[i])
-		if (++i == 6)
-			return (true);
-	return (false);
-}
-
-//this isn't working, the colors and textures can be in any order 
-bool	texcol_check(char **map, t_mdata *fd, int i, int y)
+bool	texcol_check(t_mdata *fd, int i, int y)
 {
 	char	*tex[5];
 	int		pos;
 
+	printf("HERE\n");
 	while (++i < 7)
 		tex[i] = (char *[7]){"NO ./", "SO ./", "WE ./", "EA ./", "F ", \
 		"C ", NULL}[i];
 	y = 0;
-	while (map[y])
+	while (fd->map[y])
 	{
-		if (!is_full(fd->tex) && get_texcol(&pos, map[y], tex) && pos <= 3)
-			ft_strlcpy(fd->tex[pos], ft_strchr(map[y], '/') + 1, \
-			ft_strlen(ft_strchr(map[y], '/') + 1) + 1);
-		if (!is_full(fd->tex) && get_texcol(&pos, map[y], tex) && pos > 3)
-			ft_strlcpy(fd->tex[pos], ft_strchr(map[y], ' ') + 1, \
-			ft_strlen(ft_strchr(map[y], ' ') + 1) + 1);
+		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos <= 3)
+			ft_strlcpy(fd->tex[pos], ft_strchr(fd->map[y], '/') + 1, \
+			ft_strlen(ft_strchr(fd->map[y], '/') + 1) + 1);
+		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos > 3)
+			ft_strlcpy(fd->tex[pos], ft_strchr(fd->map[y], ' ') + 1, \
+			ft_strlen(ft_strchr(fd->map[y], ' ') + 1) + 1);
 		y++;
 	}
 	if (is_full(fd->tex))
@@ -125,17 +78,24 @@ bool	texcol_check(char **map, t_mdata *fd, int i, int y)
 	return (false);
 }
 
+
 //bool	cr_map(t_mdata *fdata, t_pos p)
 //{
-//	char	**tmp;
+//	while (fdata->map[p.y])
+//	{
+//		while (fdata->map[p.y][p.x])
+//			if (ischar(fdata->map[p.y][p.x++]) && !is_texcol(p.y, fdata))
+//		p.x = 0;
+//		p.y++;
+//	}
+
+
 
 //	while (l_ismap(fdata->map[p.x]))
 //		p.x--;
 //	p.x++;
 //	while (l_ismap(fdata->map[p.x]))
-//	{
-		
-//	}
+//		p.x--;
 //}
 
 bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
@@ -145,7 +105,7 @@ bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
 	fdata->map = split;
 	if (ft_strncmp(ft_strchr(file_name, '.'), ".cub", 5))
 		return (err_msg("Bad extension"));
-	if (!texcol_check(fdata->map, fdata, -1, 0))
+	if (!texcol_check(fdata, -1, 0))
 		return (err_msg("Bad texcol"));
 	//if (!cr_map(fdata, (t_pos){0, 0}))
 	//	return (false);
