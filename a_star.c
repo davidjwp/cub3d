@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 21:24:05 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/17 20:15:02 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/17 20:29:26 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,5 +14,6 @@
 
 bool	a_star(t_mdata *fdata)
 {
-
+	fdata->m_nodes = malloc(sizeof(t_nodes *) * );
+	while ()
 }
