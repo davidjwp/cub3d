@@ -6,7 +6,7 @@
 #    By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/16 14:07:50 by djacobs           #+#    #+#              #
-#    Updated: 2024/01/16 17:39:26 by djacobs          ###   ########.fr        #
+#    Updated: 2024/01/17 17:40:35 by djacobs          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,11 @@ LINKER		:= -L -llibft
 LIBFT_DIR	:= libft
 LIBFT		:= $(LIBFT_DIR)/libft.a
 
-SRCS		:= Parser.c utilsA.c utilsB.c
+SRCS		:=	Parser.c \
+				utilsA.c \
+				utilsB.c \
+				utilsC.c \
+				u_test.c 
 OBJS		:= $(SRCS:.c=.o)
 
 all: $(NAME)

@@ -1,18 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   a_star.c                                           :+:      :+:    :+:   */
+/*   u_test.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/15 21:24:05 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/17 20:15:02 by djacobs          ###   ########.fr       */
+/*   Created: 2024/01/17 16:17:57 by djacobs           #+#    #+#             */
+/*   Updated: 2024/01/17 19:45:38 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-bool	a_star(t_mdata *fdata)
+void	print_map(char **split)
 {
-
+	for(int y = 0, i = 0; split[y]; y++){
+		for(; split[y][i]; i++)
+			split[y][i] == '\t' ? write (1, "    ", 4) : write (1, &split[y][i], 1);
+		i = 0;
+		if (split[y][i] != '\n')
+			write (1, "\n", 1);
+	}	
 }
+

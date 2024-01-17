@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 14:03:39 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/16 19:53:26 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/17 20:01:08 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,13 +52,17 @@ bool	is_texcol(int pos, t_mdata *fdata)
 	return (false);
 }
 
-bool	find_char(t_mdata *fdata, t_pos *p)
+/*
+*	finds the character from the position of the last texture or color
+*/
+bool	find_char(t_mdata *fdata, t_pos *p, int hp)
 {
-	while (fdata->map[++p->y] != NULL)
+	while ((&fdata->map[hp])[++p->y] != NULL)
 	{
-		while (fdata->map[p->y][++p->x])
-			if (ischar(fdata->map[p->y][p->x]) && !is_texcol(p->y, fdata))
-				return (true);
+		if (l_ismap((&fdata->map[hp])[p->y]))
+			while ((&fdata->map[hp])[p->y][++p->x])
+				if (ischar((&fdata->map[hp])[p->y][p->x]))
+					return (p->y += hp, true);
 		p->x = -1;
 	}
 	return (false);
@@ -70,28 +74,16 @@ bool	find_char(t_mdata *fdata, t_pos *p)
 int	find_map(t_mdata *fdata, t_pos *p)
 {
 	int		len;
-	int		i;
 
-	i = -1;
-	if (!find_char(fdata, p))
-		return (-1);
+	if (!find_char(fdata, p, find_highest(fdata->tc_index)))
+		return (err_msg("no character"), p->y = -1, -1);
 	len = p->y;
 	while (l_ismap(fdata->map[len]))
 		len++;
-	while (fdata->map[p->y][++p->x])
-	{
-		if (l_ismap(fdata->map[p->y]))
-		{
-			p->y--;
-			p->x = -1;
-		}
-		else
-			break ;
-	}
-	while (++i < 6)
-		if (fdata->tc_index[i] > p->y + 1)
-			return (err_msg("Wrong texture placement"), -1);
-	return (len - p->y);
+	while (l_ismap(fdata->map[p->y]))
+		p->y--;
+	p->y++;
+	return ((len - p->y));
 }
 
 bool	is_full(char **map)

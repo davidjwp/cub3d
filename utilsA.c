@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 14:26:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/16 20:55:14 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/17 19:54:07 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,48 +35,25 @@ bool	ischar(char c)
 	return (false);
 }
 
-//bool	l_ismap(char *l)
-//{
-//	bool	s;
-//	int		i;
-
-//	s = false;
-//	if (!l)
-//		return (false);
-//	i = -1;
-//	while (l[++i])
-//	{
-//		if (ismap(l[i]))
-//			s = true;
-//		while (l[i] == 32 || l[i] == 9)
-//			i++;
-//		if (!ismap(l[i]) && !s && !l[i])
-//			return (false);
-//	}
-//	return (true);
-//}
-
 bool	l_ismap(char *l)
 {
 	int		i;
 
 	if (!l)
 		return (false);
+	if (l_issp(l))
+		return (false);
 	i = -1;
 	while (l[++i])
-	{
-		while (l[i] == 32 || l[i] == 9)
-			i++;
-		if (!ismap(l[i]))
+		if (!ismap(l[i]) && l[i] != 32 && l[i] != 9)
 			return (false);
-	}
 	return (true);
 }
 
 
 bool	err_msg(const char *msg)
 {
-	write(2, "Error: ", 8);
+	write(2, "\033[101mError\033[0m\n", 17);
 	write(2, msg, ft_strlen(msg));
 	write(2, "\n", 1);
 	return (false);
