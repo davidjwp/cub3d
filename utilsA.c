@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 14:26:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/17 19:54:07 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/18 19:04:56 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,5 +64,7 @@ void	clean_all(char *buf, t_mdata mdata, int fd)
 	free(buf);
 	free_split(mdata.map, 0);
 	free_split(mdata.tex, 0);
+	if (mdata.m_nodes != NULL)
+		free_nodes(mdata.m_nodes, mdata.mlw, 0);
 	close(fd);
 }

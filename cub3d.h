@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 13:58:28 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/17 20:24:49 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/18 19:29:48 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,18 +32,12 @@ typedef struct s_star{
 	t_pos	end;
 }t_star;
 
-typedef struct s_mstar{
-	bool	visited;
-	int		f;
-	int		g;
-	int		h;
-}t_mstar;
-
+//node position, wall = 1 not wall = 0, space, visited
 typedef struct s_nodes{
 	t_pos	p;
 	bool	w;
 	bool	s;
-	t_mstar	star;
+	bool	visited;
 }t_nodes;
 
 typedef struct s_mdata{
@@ -51,17 +45,8 @@ typedef struct s_mdata{
 	char	**tex;
 	t_nodes	**m_nodes;
 	int		tc_index[6];
+	t_pos	mlw;
 }t_mdata;
-
-typedef struct star_s {
-	t_pos	start;
-	t_pos	end;
-	t_pos	mapwl;
-	int		distance;
-	int		exit;
-	int		items;
-	int		dt_items;
-}t_star;
 
 enum e_textures{
 	NO,
@@ -88,9 +73,12 @@ bool	is_full(char **map);
 /*		UtilsC			*/
 int		find_highest(int *index);
 bool	l_issp(char	*map);
-
+void	free_nodes(t_nodes **nodes, t_pos mlw, int index);
+t_pos	get_mlw(char **map);
+void	set_node(t_nodes *n, bool s, bool w, t_pos p);
 
 /*		u_test			*/
 void	print_map(char **map);
+void	PrintNodes(t_mdata *f);
 
 #endif

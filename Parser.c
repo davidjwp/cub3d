@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/14 20:21:47 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/17 20:12:54 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/18 19:30:02 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,67 @@ bool	cr_map(t_mdata *fdata)
 	return (true);
 }
 
+void	setn_line(t_nodes **nl, char *line, t_pos p, int len)
+{
+	int	l;
+	int	i;
+
+	l = ft_strlen(line);
+	while (++p.x < len)
+	{
+		i = p.x;
+		if (i < l && line[i] == ' ')
+			set_node(&(nl[0][p.x]), true, false, p);
+		else if (i < l && line[i] == '\t')
+		{
+			while (&(nl[0][p.x]) != &(nl[0][i  + 4]))
+			{
+				set_node(&(nl[0][p.x]), true, false, p);
+				p.x++;	
+			}
+		}
+		else if (i < l && line[i] == '1')
+			set_node(&(nl[0][p.x]), false, true, p);
+		else if (i < l && (line[i] == '0' || ischar(line[i])))
+			set_node(&(nl[0][p.x]), false, false, p);
+		else
+			set_node(&(nl[0][p.x]), true, false, p);
+	}
+}
+
+bool	cr_nodes(t_mdata *fdata)
+{
+	t_nodes	**nodes;
+	t_pos	p;
+	int		l;
+
+	p = get_mlw(fdata->map);
+	fdata->mlw = p;
+	l = p.x;
+	nodes = malloc(sizeof(t_nodes *) * (p.y + 1));
+	if (!nodes)
+		return (err_msg("cr_nodes malloc fail"));
+	nodes[p.y] = NULL;
+	while (--p.y >= 0)
+	{
+		p.x = -1;
+		nodes[p.y] = malloc(sizeof(t_nodes) * (l + 1));
+		if (!nodes[p.y])
+			return (free_nodes(nodes, fdata->mlw, p.y), err_msg("i crn fail"));
+		setn_line(&nodes[p.y], fdata->map[p.y], (t_pos){-1, p.y}, fdata->mlw.x);
+	}
+	fdata->m_nodes = nodes;
+	return (true);
+}
+
+bool	is_open(t_mdata *fdata)
+{
+	if (!cr_nodes(fdata))
+		return (false);
+	PrintNodes(fdata);
+	return (true);
+}
+
 bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
 {
 	if (split == NULL)
@@ -118,7 +179,8 @@ bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
 		return (err_msg("Bad texcol"));
 	if (!cr_map(fdata))
 		return (false);
-	if (a_star(fdata))
+	if (!is_open(fdata))
+		return (err_msg("Map is open"));
 	//print_map(fdata->map);
 	return (true);
 }
@@ -131,7 +193,7 @@ int	main(void)
 	char		*buf;
 
 	/*			initialization			*/
-	fdata = (t_mdata){NULL, NULL, {0, 0, 0, 0, 0, 0}};
+	fdata = (t_mdata){NULL, NULL, NULL, {0, 0, 0, 0, 0, 0}, {0, 0}};
 	fdata.tex = malloc(sizeof(char *) * 7);
 	if (!fdata.tex)
 		return (err_msg("malloc fail"), -1);
