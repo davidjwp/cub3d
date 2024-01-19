@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 13:58:28 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/18 19:29:48 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/19 18:56:49 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,16 +37,22 @@ typedef struct s_nodes{
 	t_pos	p;
 	bool	w;
 	bool	s;
+	bool	c;
 	bool	visited;
-}t_nodes;
+}t_n;
 
 typedef struct s_mdata{
 	char	**map;
 	char	**tex;
-	t_nodes	**m_nodes;
+	t_n	**m_nodes;
 	int		tc_index[6];
 	t_pos	mlw;
 }t_mdata;
+
+typedef struct s_lst{
+	t_n			*node;
+	struct s_lst	*next;
+}t_lst;
 
 enum e_textures{
 	NO,
@@ -57,6 +63,7 @@ enum e_textures{
 	C,
 };
 
+/*					Parser					*/
 /*		UtilsA			*/
 bool	ismap(char c);
 bool	ischar(char c);
@@ -73,9 +80,13 @@ bool	is_full(char **map);
 /*		UtilsC			*/
 int		find_highest(int *index);
 bool	l_issp(char	*map);
-void	free_nodes(t_nodes **nodes, t_pos mlw, int index);
+void	free_nodes(t_n **nodes, t_pos mlw, int index);
 t_pos	get_mlw(char **map);
-void	set_node(t_nodes *n, bool s, bool w, t_pos p);
+void	set_node(t_n *n, t_n set);
+
+/*		cr_map			*/
+bool	cr_map(t_mdata *fdata);
+bool	texcol_check(t_mdata *fd, int i, int y);
 
 /*		u_test			*/
 void	print_map(char **map);

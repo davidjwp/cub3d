@@ -6,7 +6,7 @@
 #    By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/16 14:07:50 by djacobs           #+#    #+#              #
-#    Updated: 2024/01/17 17:40:35 by djacobs          ###   ########.fr        #
+#    Updated: 2024/01/19 18:21:29 by djacobs          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,9 @@ SRCS		:=	Parser.c \
 				utilsA.c \
 				utilsB.c \
 				utilsC.c \
-				u_test.c 
+				u_test.c \
+				cr_map.c \
+
 OBJS		:= $(SRCS:.c=.o)
 
 all: $(NAME)

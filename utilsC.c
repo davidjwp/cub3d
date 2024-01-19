@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/17 17:39:02 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/18 19:21:15 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/19 18:55:49 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ bool	l_issp(char	*map)
 	return (false);
 }
 
-void	free_nodes(t_nodes **nodes, t_pos mlw, int index)
+void	free_nodes(t_n **nodes, t_pos mlw, int index)
 {
 	if (!index)
 	{
@@ -85,12 +85,13 @@ t_pos	get_mlw(char **map)
 	return ((t_pos){len, p.y});
 }
 
-void	set_node(t_nodes *n, bool s, bool w, t_pos p)
+void	set_node(t_n *n, t_n set)
 {
-	n->p.y = p.y;
-	n->p.x = p.x;
-	n->s = s;
-	n->w = w;
+	n->p.y = set.p.y;
+	n->p.x = set.p.x;
+	n->s = set.s;
+	n->w = set.w;
+	n->c = set.c;
 	n->visited = false;
 	(void)n;
 }

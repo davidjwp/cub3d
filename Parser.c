@@ -6,152 +6,56 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/14 20:21:47 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/18 19:30:02 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/19 22:39:59 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-//gcc -g3 -Wall -Werror -Wextra Parser.c utilsA.c utilsB.c -L -llibft libft/libft.a
-/*
-*	Checks for spaces and tabs before the textures and colors then trims tabs
-*	and spaces off the end of the string.
-*
-*	Returns a boolean value
-*/
-bool	trim(t_mdata *md)
+void	setn_line(t_n **nl, char *line, t_pos p, int len)
 {
-	void	*tmp;
-	int		i;
-
-	i = -1;
-	while (md->tex[++i] != NULL)
-		if (*md->tex[i] == ' ' || *md->tex[i] == '\t')
-			return (false);
-	i = 0;
-	while (md->tex[i] != NULL)
-	{
-		tmp = md->tex[i];
-		md->tex[i] = ft_strtrim((md->tex[i]), " \t");
-		if (!md->tex[i])
-			return (md->tex[i] = tmp, err_msg("trim malloc fail"), false);
-		free(tmp);
-		i++;
-	}
-	return (true);
-}
-
-bool	texcol(int *pos, t_mdata *fd, int y, char **tex)
-{
-	*pos = 0;
-	while (tex[*pos] != NULL)
-	{
-		if (!ft_strncmp(fd->map[y], tex[*pos], ft_strlen(tex[*pos])))
-			return (fd->tc_index[*pos] = y, true);
-		*pos += 1;
-	}
-	return (false);
-}
-
-bool	texcol_check(t_mdata *fd, int i, int y)
-{
-	char	*tex[5];
-	int		pos;
-
-	while (++i < 7)
-		tex[i] = (char *[7]){"NO ./", "SO ./", "WE ./", "EA ./", "F ", \
-		"C ", NULL}[i];
-	y = 0;
-	while (fd->map[y])
-	{
-		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos <= 3)
-			ft_strlcpy(fd->tex[pos], ft_strchr(fd->map[y], '/') + 1, \
-			ft_strlen(ft_strchr(fd->map[y], '/') + 1) + 1);
-		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos > 3)
-			ft_strlcpy(fd->tex[pos], ft_strchr(fd->map[y], ' ') + 1, \
-			ft_strlen(ft_strchr(fd->map[y], ' ') + 1) + 1);
-		y++;
-	}
-	if (is_full(fd->tex))
-		return (trim(fd));
-	return (false);
-}
-
-//start searching the map from the position of the last color of texture
-bool	cr_map(t_mdata *fdata)
-{
-	char	**tmp;
-	int		len;
-	t_pos	p;
-	int		i;
-
-	i = -1;
-	p = (t_pos){-1, -1};
-	len = find_map(fdata, &p) + 1;
-	if (p.y < 0 || p.y < find_highest(fdata->tc_index))
-		return (false);
-	tmp = malloc(sizeof(char *) * len);
-	if (!tmp)
-		return (err_msg("cr_map malloc fail"));
-	tmp[len - 1] = NULL;
-	while (--len)
-	{
-		tmp[++i] = malloc(sizeof(char) * (ft_strlen(fdata->map[p.y]) + 1));
-		if (!tmp[i])
-			return (free_split(tmp, i), err_msg("cr_map index malloc fail"));
-		ft_strlcpy(tmp[i], fdata->map[p.y], ft_strlen(fdata->map[p.y]) + 1);
-		p.y++;
-	}
-	free_split(fdata->map, 0);
-	fdata->map = tmp;
-	return (true);
-}
-
-void	setn_line(t_nodes **nl, char *line, t_pos p, int len)
-{
-	int	l;
 	int	i;
+	int	tmp;
+	int	l;
 
+	i = -1;
 	l = ft_strlen(line);
 	while (++p.x < len)
 	{
-		i = p.x;
-		if (i < l && line[i] == ' ')
-			set_node(&(nl[0][p.x]), true, false, p);
-		else if (i < l && line[i] == '\t')
+		while (++i < l && line[i] == '\t')
 		{
-			while (&(nl[0][p.x]) != &(nl[0][i  + 4]))
-			{
-				set_node(&(nl[0][p.x]), true, false, p);
-				p.x++;	
-			}
+			tmp =  4 + p.x--;
+			while (&(nl[0][++p.x]) != &(nl[0][tmp]))
+				set_node(&(nl[0][p.x]), (t_n){p, false, true, false, false});
 		}
-		else if (i < l && line[i] == '1')
-			set_node(&(nl[0][p.x]), false, true, p);
-		else if (i < l && (line[i] == '0' || ischar(line[i])))
-			set_node(&(nl[0][p.x]), false, false, p);
+		if (i < l && line[i] == '1')
+			set_node(&(nl[0][p.x]), (t_n){p, true, false, false, false});
+		else if (i < l && line[i] == '0')
+			set_node(&(nl[0][p.x]), (t_n){p, false, false, false, false});
+		else if (i < l && ischar(line[i]))
+			set_node(&(nl[0][p.x]), (t_n){p, false, false, true, false});
 		else
-			set_node(&(nl[0][p.x]), true, false, p);
+			set_node(&(nl[0][p.x]), (t_n){p, false, true, false, false});
 	}
 }
 
 bool	cr_nodes(t_mdata *fdata)
 {
-	t_nodes	**nodes;
+	t_n	**nodes;
 	t_pos	p;
 	int		l;
 
 	p = get_mlw(fdata->map);
 	fdata->mlw = p;
 	l = p.x;
-	nodes = malloc(sizeof(t_nodes *) * (p.y + 1));
+	nodes = malloc(sizeof(t_n *) * (p.y + 1));
 	if (!nodes)
 		return (err_msg("cr_nodes malloc fail"));
 	nodes[p.y] = NULL;
 	while (--p.y >= 0)
 	{
 		p.x = -1;
-		nodes[p.y] = malloc(sizeof(t_nodes) * (l + 1));
+		nodes[p.y] = malloc(sizeof(t_n) * (l + 1));
 		if (!nodes[p.y])
 			return (free_nodes(nodes, fdata->mlw, p.y), err_msg("i crn fail"));
 		setn_line(&nodes[p.y], fdata->map[p.y], (t_pos){-1, p.y}, fdata->mlw.x);
@@ -160,14 +64,126 @@ bool	cr_nodes(t_mdata *fdata)
 	return (true);
 }
 
-bool	is_open(t_mdata *fdata)
+bool	add_lst(t_lst **l, t_n *node)
 {
-	if (!cr_nodes(fdata))
-		return (false);
-	PrintNodes(fdata);
+	t_lst	*tmp;
+	t_lst	*add;
+
+	tmp = *l;
+	while (tmp->next != NULL)
+		tmp = tmp->next;
+	add = malloc(sizeof(t_lst));
+	if (!add)
+		return (err_msg("add_lst malloc fail"));
+	add->next = NULL;
+	add->node = node;
+	tmp->next = add;
 	return (true);
 }
 
+bool	find_nchar(t_n **start, t_mdata *f)
+{
+	t_pos	p;
+	int		n;
+
+	n = 0;
+	p = (t_pos){-1, -1};
+	while (++p.y < f->mlw.y)
+	{
+		while (++p.x < f->mlw.x)
+		{
+			if (f->m_nodes[p.y][p.x].c)
+			{
+				*start = &f->m_nodes[p.y][p.x];
+				n++;
+			}
+		}
+		p.x = -1;
+	}
+	if (n > 1)
+		return (err_msg("too many characterss"));
+	(*start)->visited = true;
+	return (true);
+}
+
+bool	n_open(t_n **node, t_pos p, t_pos mlw)
+{
+	if (p.y + 1 >= mlw.y || p.y - 1 <= 0 || p.x + 1 >= mlw.x || p.x - 1 <= 0)
+		return (true);
+	if (node[p.y + 1][p.x].s || \
+	node[p.y - 1][p.x].s || \
+	node[p.y][p.x + 1].s || \
+	node[p.y][p.x - 1].s)
+		return (true);
+	return (false);
+}
+
+bool	av_node(t_lst **l, t_n **node, t_pos mlw)
+{
+	if (n_open(node, (*l)->node->p, mlw))
+		return (err_msg("map is open"));
+	if (!node[(*l)->node->p.y + 1][(*l)->node->p.x].w && \
+	!node[(*l)->node->p.y + 1][(*l)->node->p.x].visited)
+		add_lst(l, &node[(*l)->node->p.y + 1][(*l)->node->p.x]);
+	if (!node[(*l)->node->p.y - 1][(*l)->node->p.x].w && \
+	!node[(*l)->node->p.y - 1][(*l)->node->p.x].visited)
+		add_lst(l, &node[(*l)->node->p.y - 1][(*l)->node->p.x]);
+	if (!node[(*l)->node->p.y][(*l)->node->p.x - 1].w && \
+	!node[(*l)->node->p.y][(*l)->node->p.x - 1].visited)
+		add_lst(l, &node[(*l)->node->p.y][(*l)->node->p.x - 1]);
+	if (!node[(*l)->node->p.y][(*l)->node->p.x + 1].w && \
+	!node[(*l)->node->p.y][(*l)->node->p.x + 1].visited)
+		add_lst(l, &node[(*l)->node->p.y][(*l)->node->p.x + 1]);
+	return (true);
+}
+
+static bool	cr_lst(t_lst **l, t_n **start)
+{
+	l = malloc(sizeof(t_lst *));
+	if (!l)
+		return (err_msg("lst malloc fail"));
+	*l = malloc(sizeof(t_lst));
+	if (!(*l))
+		return (err_msg("*lst malloc fail"));
+	(*l)->next = NULL;
+	(*l)->node = *start;
+	return (true);
+}
+
+void	rem_l(t_lst **lst)
+{
+	t_lst	*tmp;
+
+	tmp = (*lst)->next;
+	free()
+}
+
+bool	is_open(t_mdata *fdata)
+{
+	t_n		*current;
+	t_lst	*l;
+	t_pos	p;
+
+	p = (t_pos){-1, -1};
+	current = NULL;
+	if (!cr_nodes(fdata))
+		return (false);
+	if (!find_nchar(&current, fdata))
+		return (false);
+	if (!cr_lst(&l, &current))
+		return (false);
+	while (l != NULL && !(*l).node->visited)
+	{
+		av_node(&l, fdata->m_nodes, fdata->mlw);
+		current = l->node;
+		current->visited = true;
+		
+	}
+	//PrintNodes(fdata);
+	return (true);
+}
+
+//check if there are multiple characters in the map
 bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
 {
 	if (split == NULL)

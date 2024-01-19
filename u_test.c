@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/17 16:17:57 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/18 19:37:35 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/19 19:20:19 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,11 @@ void	print_map(char **split)
 	}	
 }
 
-static void	_pNode(t_nodes node)
+static void	_pNode(t_n node)
 {
-	if (node.s)
+	if (node.c)
+		write (1, "C", 1);
+	else if (node.s)
 		write (1, " ", 1);
 	else if (node.w)
 		write (1, "1", 1);
@@ -36,6 +38,6 @@ static void	_pNode(t_nodes node)
 void	PrintNodes(t_mdata *f)
 {
 	for (int i = 0; i <= f->mlw.y; i++)
-		for(int y = 0; y <= f->mlw.x; y++)
+		for(int y = 0; y <= f->mlw.x && f->m_nodes[i] != NULL; y++)
 			y == f->mlw.x ? write (1, "\n", 1) : _pNode(f->m_nodes[i][y]);
 }
