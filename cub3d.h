@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 13:58:28 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/19 18:56:49 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/20 21:43:44 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,12 @@
 # include <fcntl.h>
 # include <stdbool.h>
 # include "libft/libft.h"
+# include "MLX42/include/MLX42/MLX42.h"
 
 # define BUF_SIZ 8192
+# define WIDTH 512
+# define HEIGHT 512
+# define BLOCK 32;
 
 typedef struct s_pos{
 	int	x;
@@ -32,7 +36,7 @@ typedef struct s_star{
 	t_pos	end;
 }t_star;
 
-//node position, wall = 1 not wall = 0, space, visited
+//node position, wall = 1 not wall = 0, space, character, visited
 typedef struct s_nodes{
 	t_pos	p;
 	bool	w;
@@ -44,24 +48,20 @@ typedef struct s_nodes{
 typedef struct s_mdata{
 	char	**map;
 	char	**tex;
-	t_n	**m_nodes;
+	t_n		**m_nodes;
 	int		tc_index[6];
 	t_pos	mlw;
 }t_mdata;
+
+typedef struct s_cub3D{
+	t_mdata	fdata;
+	mlx_t	*mlx;
+}t_cub;
 
 typedef struct s_lst{
 	t_n			*node;
 	struct s_lst	*next;
 }t_lst;
-
-enum e_textures{
-	NO,
-	SO,
-	WE,
-	EA,
-	F,
-	C,
-};
 
 /*					Parser					*/
 /*		UtilsA			*/
@@ -80,16 +80,20 @@ bool	is_full(char **map);
 /*		UtilsC			*/
 int		find_highest(int *index);
 bool	l_issp(char	*map);
-void	free_nodes(t_n **nodes, t_pos mlw, int index);
-t_pos	get_mlw(char **map);
-void	set_node(t_n *n, t_n set);
+bool	free_lst(t_lst *l);
 
 /*		cr_map			*/
 bool	cr_map(t_mdata *fdata);
 bool	texcol_check(t_mdata *fd, int i, int y);
 
+/*		cr_nodes		*/
+bool	cr_nodes(t_mdata *fdata);
+void	free_nodes(t_n **nodes, t_pos mlw, int index);
+
 /*		u_test			*/
 void	print_map(char **map);
 void	PrintNodes(t_mdata *f);
+void	tty_print(t_mdata *f, t_lst *l, t_n *c, int i);
+
 
 #endif

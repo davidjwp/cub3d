@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/17 17:39:02 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/19 18:55:49 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/20 20:30:18 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,58 +40,18 @@ bool	l_issp(char	*map)
 	return (false);
 }
 
-void	free_nodes(t_n **nodes, t_pos mlw, int index)
+bool	free_lst(t_lst *l)
 {
-	if (!index)
-	{
-		while (index != mlw.y)
-			free(nodes[index++]);
-	}
-	else
-	{
-		while (index)
-		{
-			free(nodes[index]);
-			index--;
-		}	
-	}
-	free(nodes);
-	nodes = NULL;
-}
+	t_lst	*f;
 
-t_pos	get_mlw(char **map)
-{
-	int		len;
-	t_pos	p;
-	int		t;
-
-	len = 0;
-	p.y = -1;
-	while (map[++p.y])
+	if (!l)
+		return (false);
+	while (l->next != NULL)
 	{
-		p.x = -1;
-		t = 0;
-		while (map[p.y][++p.x])
-			if (map[p.y][p.x] == 9)
-				t++;
-		if (len < p.x || (t && (p.x + (3 * t)) > len))
-		{
-			if (t && (p.x + (3 * t)) > len)
-				len = p.x + (3 * t);
-			else
-				len = p.x;
-		}
+		f = l;
+		l = l->next;
+		free(f);
 	}
-	return ((t_pos){len, p.y});
-}
-
-void	set_node(t_n *n, t_n set)
-{
-	n->p.y = set.p.y;
-	n->p.x = set.p.x;
-	n->s = set.s;
-	n->w = set.w;
-	n->c = set.c;
-	n->visited = false;
-	(void)n;
+	free(l);
+	return (false);
 }

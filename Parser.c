@@ -6,80 +6,11 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/14 20:21:47 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/19 22:39:59 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/20 21:46:00 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-void	setn_line(t_n **nl, char *line, t_pos p, int len)
-{
-	int	i;
-	int	tmp;
-	int	l;
-
-	i = -1;
-	l = ft_strlen(line);
-	while (++p.x < len)
-	{
-		while (++i < l && line[i] == '\t')
-		{
-			tmp =  4 + p.x--;
-			while (&(nl[0][++p.x]) != &(nl[0][tmp]))
-				set_node(&(nl[0][p.x]), (t_n){p, false, true, false, false});
-		}
-		if (i < l && line[i] == '1')
-			set_node(&(nl[0][p.x]), (t_n){p, true, false, false, false});
-		else if (i < l && line[i] == '0')
-			set_node(&(nl[0][p.x]), (t_n){p, false, false, false, false});
-		else if (i < l && ischar(line[i]))
-			set_node(&(nl[0][p.x]), (t_n){p, false, false, true, false});
-		else
-			set_node(&(nl[0][p.x]), (t_n){p, false, true, false, false});
-	}
-}
-
-bool	cr_nodes(t_mdata *fdata)
-{
-	t_n	**nodes;
-	t_pos	p;
-	int		l;
-
-	p = get_mlw(fdata->map);
-	fdata->mlw = p;
-	l = p.x;
-	nodes = malloc(sizeof(t_n *) * (p.y + 1));
-	if (!nodes)
-		return (err_msg("cr_nodes malloc fail"));
-	nodes[p.y] = NULL;
-	while (--p.y >= 0)
-	{
-		p.x = -1;
-		nodes[p.y] = malloc(sizeof(t_n) * (l + 1));
-		if (!nodes[p.y])
-			return (free_nodes(nodes, fdata->mlw, p.y), err_msg("i crn fail"));
-		setn_line(&nodes[p.y], fdata->map[p.y], (t_pos){-1, p.y}, fdata->mlw.x);
-	}
-	fdata->m_nodes = nodes;
-	return (true);
-}
-
-bool	add_lst(t_lst **l, t_n *node)
-{
-	t_lst	*tmp;
-	t_lst	*add;
-
-	tmp = *l;
-	while (tmp->next != NULL)
-		tmp = tmp->next;
-	add = malloc(sizeof(t_lst));
-	if (!add)
-		return (err_msg("add_lst malloc fail"));
-	add->next = NULL;
-	add->node = node;
-	tmp->next = add;
-	return (true);
-}
 
 bool	find_nchar(t_n **start, t_mdata *f)
 {
@@ -101,14 +32,40 @@ bool	find_nchar(t_n **start, t_mdata *f)
 		p.x = -1;
 	}
 	if (n > 1)
-		return (err_msg("too many characterss"));
+		return (err_msg("too many characters"));
 	(*start)->visited = true;
+	return (true);
+}
+
+bool	add_lst(t_lst **l, t_n *node)
+{
+	t_lst	*tmp;
+	t_lst	*add;
+
+	tmp = *l;
+	if (!tmp)
+	{
+		*l = malloc(sizeof(t_lst));
+		if (!(*l))
+			return (err_msg("add_lst malloc fail"));
+		(*l)->next = NULL;
+		(*l)->node = &(*node);
+		return (true);
+	}
+	while (tmp->next != NULL)
+		tmp = tmp->next;
+	add = malloc(sizeof(t_lst));
+	if (!add)
+		return (err_msg("add_lst malloc fail"));
+	add->next = NULL;
+	add->node = &(*node);
+	tmp->next = add;
 	return (true);
 }
 
 bool	n_open(t_n **node, t_pos p, t_pos mlw)
 {
-	if (p.y + 1 >= mlw.y || p.y - 1 <= 0 || p.x + 1 >= mlw.x || p.x - 1 <= 0)
+	if (p.y + 1 >= mlw.y || p.y - 1 < 0 || p.x + 1 >= mlw.x || p.x - 1 < 0)
 		return (true);
 	if (node[p.y + 1][p.x].s || \
 	node[p.y - 1][p.x].s || \
@@ -118,68 +75,79 @@ bool	n_open(t_n **node, t_pos p, t_pos mlw)
 	return (false);
 }
 
-bool	av_node(t_lst **l, t_n **node, t_pos mlw)
+bool	av_node(t_lst **l, t_n **node, t_n *current, t_pos mlw)
 {
-	if (n_open(node, (*l)->node->p, mlw))
+	if (n_open(node, current->p, mlw))
 		return (err_msg("map is open"));
-	if (!node[(*l)->node->p.y + 1][(*l)->node->p.x].w && \
-	!node[(*l)->node->p.y + 1][(*l)->node->p.x].visited)
-		add_lst(l, &node[(*l)->node->p.y + 1][(*l)->node->p.x]);
-	if (!node[(*l)->node->p.y - 1][(*l)->node->p.x].w && \
-	!node[(*l)->node->p.y - 1][(*l)->node->p.x].visited)
-		add_lst(l, &node[(*l)->node->p.y - 1][(*l)->node->p.x]);
-	if (!node[(*l)->node->p.y][(*l)->node->p.x - 1].w && \
-	!node[(*l)->node->p.y][(*l)->node->p.x - 1].visited)
-		add_lst(l, &node[(*l)->node->p.y][(*l)->node->p.x - 1]);
-	if (!node[(*l)->node->p.y][(*l)->node->p.x + 1].w && \
-	!node[(*l)->node->p.y][(*l)->node->p.x + 1].visited)
-		add_lst(l, &node[(*l)->node->p.y][(*l)->node->p.x + 1]);
+	if (!node[current->p.y + 1][current->p.x].w && \
+	!node[current->p.y + 1][current->p.x].visited)
+		add_lst(l, &node[current->p.y + 1][current->p.x]);
+	if (!node[current->p.y - 1][current->p.x].w && \
+	!node[current->p.y - 1][current->p.x].visited)
+		add_lst(l, &node[current->p.y - 1][current->p.x]);
+	if (!node[current->p.y][current->p.x - 1].w && \
+	!node[current->p.y][current->p.x - 1].visited)
+		add_lst(l, &node[current->p.y][current->p.x - 1]);
+	if (!node[current->p.y][current->p.x + 1].w && \
+	!node[current->p.y][current->p.x + 1].visited)
+		add_lst(l, &node[current->p.y][current->p.x + 1]);
 	return (true);
 }
 
-static bool	cr_lst(t_lst **l, t_n **start)
-{
-	l = malloc(sizeof(t_lst *));
-	if (!l)
-		return (err_msg("lst malloc fail"));
-	*l = malloc(sizeof(t_lst));
-	if (!(*l))
-		return (err_msg("*lst malloc fail"));
-	(*l)->next = NULL;
-	(*l)->node = *start;
-	return (true);
-}
-
-void	rem_l(t_lst **lst)
+void	rm_visited(t_lst **l)
 {
 	t_lst	*tmp;
+	t_lst	*prev;
+	t_lst	*f;
 
-	tmp = (*lst)->next;
-	free()
+	tmp = *l;
+	prev = NULL;
+	while (tmp != NULL)
+	{
+		if (tmp->node->visited)
+		{
+			f = tmp;
+			if (prev != NULL)
+				prev->next = tmp->next;
+			else
+				*l = tmp->next;
+			tmp = tmp->next;
+			free(f);
+		}
+		else
+		{
+			prev = tmp;
+			tmp = tmp->next;
+		}
+	}
 }
 
 bool	is_open(t_mdata *fdata)
 {
 	t_n		*current;
 	t_lst	*l;
-	t_pos	p;
 
-	p = (t_pos){-1, -1};
+	l = NULL;
 	current = NULL;
 	if (!cr_nodes(fdata))
 		return (false);
 	if (!find_nchar(&current, fdata))
 		return (false);
-	if (!cr_lst(&l, &current))
-		return (false);
-	while (l != NULL && !(*l).node->visited)
+	if (!av_node(&l, fdata->m_nodes, current, fdata->mlw))
+		return (free_lst(l), false);
+	int	i = 0;//test here
+	while (l != NULL)
 	{
-		av_node(&l, fdata->m_nodes, fdata->mlw);
 		current = l->node;
 		current->visited = true;
-		
+		rm_visited(&l);
+		if (!av_node(&l, fdata->m_nodes, current, fdata->mlw)){
+			tty_print(fdata, l, current, i++);//test here
+			return (free_lst(l));
+		}
+		tty_print(fdata, l, current, i++);//test here
 	}
-	//PrintNodes(fdata);
+	free_lst(l);
 	return (true);
 }
 
@@ -196,19 +164,28 @@ bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
 	if (!cr_map(fdata))
 		return (false);
 	if (!is_open(fdata))
-		return (err_msg("Map is open"));
-	//print_map(fdata->map);
+		return (false);
 	return (true);
 }
 
 int	main(void)
 {
+	//mlx_t		*mlx;
+	//mlx_image_t	*image;
+	
 	t_mdata		fdata;
 	const char	*file_name;
 	int			fd;
 	char		*buf;
 
 	/*			initialization			*/
+
+	//mlx initialization
+	//mlx = mlx_init(WIDTH, HEIGHT, "window", true);
+	//if (!mlx)
+	//	return (err_msg("mlx init fail"), -1);
+
+	//main data structure
 	fdata = (t_mdata){NULL, NULL, NULL, {0, 0, 0, 0, 0, 0}, {0, 0}};
 	fdata.tex = malloc(sizeof(char *) * 7);
 	if (!fdata.tex)
@@ -220,20 +197,30 @@ int	main(void)
 		*fdata.tex[i] = 0;
 	}
 	fdata.tex[6] = NULL;
+	
+	//opening files
 	file_name = "Map.cub";
 	fd = open(file_name, O_RDONLY);
 	if (fd == -1)
 		return (err_msg("open fail"), 1);
+	
+	//getting file content
 	if (gnl(fd, &buf, 0, 0))
 		return (err_msg("gnl error"), close(fd), 2);
 	if (buf == NULL)
 		return (err_msg("gnl fail"), close(fd), 3);
+	
 	/*			parsing					*/
 	if (file_parse(ft_split(buf, '\n'), file_name, &fdata))
 		printf("\033[102mgood Map\033[0m\n");
 	else
 		printf("\033[101mbad Map\033[0m\n");
+	
 	/*			cleaning up				*/
 	clean_all(buf, fdata, fd);
-	return (0);
+	
+	/*			mlx loop				*/
+	//mlx_loop(mlx);
+	//mlx_terminate(mlx);
+	return (1);
 }
