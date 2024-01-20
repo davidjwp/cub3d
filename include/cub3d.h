@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 13:58:28 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/20 21:43:44 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/20 22:51:24 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 # include <stdio.h>
 # include <fcntl.h>
 # include <stdbool.h>
-# include "libft/libft.h"
-# include "MLX42/include/MLX42/MLX42.h"
+# include "../libft/libft.h"
+# include "../MLX42/include/MLX42/MLX42.h"
 
 # define BUF_SIZ 8192
 # define WIDTH 512
@@ -64,6 +64,10 @@ typedef struct s_lst{
 }t_lst;
 
 /*					Parser					*/
+
+/*		parser			*/
+bool	file_parse(char **split, const char *file_name, t_mdata *fdata);
+
 /*		UtilsA			*/
 bool	ismap(char c);
 bool	ischar(char c);

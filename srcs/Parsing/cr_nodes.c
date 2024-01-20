@@ -6,11 +6,11 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 20:25:03 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/20 20:27:42 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/20 22:50:33 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "../include/cub3d.h"
 
 void	free_nodes(t_n **nodes, t_pos mlw, int index)
 {

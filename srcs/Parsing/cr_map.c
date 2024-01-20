@@ -6,11 +6,11 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/19 18:07:46 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/19 18:08:24 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/20 22:50:18 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "../include/cub3d.h"
 
 /*
 *	Checks for spaces and tabs before the textures and colors then trims tabs
