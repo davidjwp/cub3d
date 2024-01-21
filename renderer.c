@@ -6,11 +6,11 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/21 20:42:55 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/21 22:04:41 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//gcc renderer.c -o renderer -I./minilibx-linux -L./minilibx-linux -lmlx -lX11 -lXext -lm
+//gcc renderer.c -o render -I./minilibx-linux -L./minilibx-linux -lmlx -lX11 -lXext -lm
 #include <mlx.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -49,16 +49,20 @@ typedef struct s_mlx{
 }t_mlx;
 
 //this map is already created in the main program btw
-char map[][8] =	{{1,1,1,1,1,1,1,1},\
-				 {1,0,0,0,0,0,0,1},\
-				 {1,0,0,0,0,0,0,1},\
-				 {1,0,0,0,0,0,0,1},\
-				 {1,0,0,0,0,0,0,1},\
-				 {1,1,1,1,1,1,1,1}}; 
+char map[][8] =	{{"11111111"},\
+				 {"10100001"},\
+				 {"10100001"},\
+				 {"10100001"},\
+				 {"10000001"},\
+				 {"10000101"},\
+				 {"10000001"},\
+				 {"11111111"}};
 
 float	px, py;//player position
 
 int	lastMouseX, lastMouseY;//mouse coordinates
+
+int	mapH = 8, mapW = 8, mapS = 64;
 
 int	close_win(int key, void *param)
 {
@@ -71,6 +75,33 @@ int	close_win(int key, void *param)
 		d->win = NULL;
 	}
 	return (0);
+}
+
+void drawNode(t_mlx *d, int size, int y, int x, int color)
+{
+	int	pixel;
+
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
+			pixel = ((int)(y + i) * d->i->len + (int)(x + j) * \
+			(d->i->bpp / 8));
+			if (pixel >= 0 && pixel < WIDTH * HEIGHT * (d->i->bpp / 8)) 
+				*(int *)(d->i->add + pixel) = color;
+		}
+	}
+}
+
+void	drawMap(t_mlx *d)
+{
+
+	for (int i = 0; i < mapH; i++){
+		for(int y = 0; y < mapW; y++){
+			if (map[i][y]=='1')
+				drawNode(d, mapS, i * mapS, y * mapS, YELLOW);
+			else
+				drawNode(d, mapS, i * mapS, y * mapS, 0x00000000);
+		}
+	}
 }
 
 void drawPlayer(t_mlx *d)
@@ -99,7 +130,6 @@ void	clear_buffer(t_mlx *d)
 				*(int *)(d->i->add + pixel) = color;
 		}
 	}
-	
 }
 
 void	display(t_mlx *d)
@@ -107,6 +137,7 @@ void	display(t_mlx *d)
 	clear_buffer(d);
 	if (d->win != NULL)
 		mlx_put_image_to_window(d->mlx, d->win, d->i->img, 0, 0);
+	drawMap(d);
 	drawPlayer(d);
 	if (d->win != NULL)
 		mlx_put_image_to_window(d->mlx, d->win, d->i->img, 0, 0);
@@ -114,10 +145,10 @@ void	display(t_mlx *d)
 
 int	buttons(t_mlx *d)
 {
-	if (d->k->w){ py-=1;}
-	if (d->k->s){ py+=1;}
-	if (d->k->d){ px+=1;}
-	if (d->k->a){ px-=1;}
+	if (d->k->w){ py-=0.3;}
+	if (d->k->s){ py+=0.3;}
+	if (d->k->d){ px+=0.3;}
+	if (d->k->a){ px-=0.3;}
 	display(d);
 }
 
