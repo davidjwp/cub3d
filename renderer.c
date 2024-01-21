@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/21 22:04:41 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/21 22:19:21 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 #define WIDTH 1024
 #define HEIGHT 512
 #define YELLOW 0x00FFFF00
+#define WHITE 0x00FFFFFF
 
 typedef struct s_img{
 	void	*img;
@@ -77,6 +78,19 @@ int	close_win(int key, void *param)
 	return (0);
 }
 
+void drawBackground(t_mlx *d)
+{
+	int	pixel;
+
+	for (int i = 0; i < HEIGHT; i++) {
+		for (int j = 0; j < WIDTH; j++) {
+			pixel = (i * d->i->len + j * (d->i->bpp / 8));
+			if (pixel >= 0 && pixel < WIDTH * HEIGHT * (d->i->bpp / 8)) 
+				*(int *)(d->i->add + pixel) = 0x00808080;
+		}
+	}
+}
+
 void drawNode(t_mlx *d, int size, int y, int x, int color)
 {
 	int	pixel;
@@ -97,9 +111,9 @@ void	drawMap(t_mlx *d)
 	for (int i = 0; i < mapH; i++){
 		for(int y = 0; y < mapW; y++){
 			if (map[i][y]=='1')
-				drawNode(d, mapS, i * mapS, y * mapS, YELLOW);
+				drawNode(d, mapS - 2, i * mapS, y * mapS, WHITE);
 			else
-				drawNode(d, mapS, i * mapS, y * mapS, 0x00000000);
+				drawNode(d, mapS - 2, i * mapS, y * mapS, 0x00000000);
 		}
 	}
 }
@@ -137,6 +151,7 @@ void	display(t_mlx *d)
 	clear_buffer(d);
 	if (d->win != NULL)
 		mlx_put_image_to_window(d->mlx, d->win, d->i->img, 0, 0);
+	drawBackground(d);
 	drawMap(d);
 	drawPlayer(d);
 	if (d->win != NULL)
@@ -145,10 +160,10 @@ void	display(t_mlx *d)
 
 int	buttons(t_mlx *d)
 {
-	if (d->k->w){ py-=0.3;}
-	if (d->k->s){ py+=0.3;}
-	if (d->k->d){ px+=0.3;}
-	if (d->k->a){ px-=0.3;}
+	if (d->k->w){ py-=0.4;}
+	if (d->k->s){ py+=0.4;}
+	if (d->k->d){ px+=0.4;}
+	if (d->k->a){ px-=0.4;}
 	display(d);
 }
 
