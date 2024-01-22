@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 13:58:28 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/20 22:51:24 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/22 14:48:02 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # define WIDTH 512
 # define HEIGHT 512
 # define BLOCK 32;
+# define PI 3.14159
 
 typedef struct s_pos{
 	int	x;

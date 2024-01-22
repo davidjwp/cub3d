@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/21 22:19:21 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/22 21:25:11 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 
 #define WIDTH 1024
 #define HEIGHT 512
+#define LINE 16
 #define YELLOW 0x00FFFF00
 #define WHITE 0x00FFFFFF
 
@@ -49,6 +50,8 @@ typedef struct s_mlx{
 	t_key	*k;
 }t_mlx;
 
+#define PI 3.14159
+
 //this map is already created in the main program btw
 char map[][8] =	{{"11111111"},\
 				 {"10100001"},\
@@ -59,7 +62,9 @@ char map[][8] =	{{"11111111"},\
 				 {"10000001"},\
 				 {"11111111"}};
 
-float	px, py;//player position
+float	px, py, pa;//point position/angle
+
+float	pdx, pdy;//delta point
 
 int	lastMouseX, lastMouseY;//mouse coordinates
 
@@ -78,7 +83,7 @@ int	close_win(int key, void *param)
 	return (0);
 }
 
-void drawBackground(t_mlx *d)
+void	drawBackground(t_mlx *d)
 {
 	int	pixel;
 
@@ -91,7 +96,7 @@ void drawBackground(t_mlx *d)
 	}
 }
 
-void drawNode(t_mlx *d, int size, int y, int x, int color)
+void	drawNode(t_mlx *d, int size, int y, int x, int color)
 {
 	int	pixel;
 
@@ -118,6 +123,31 @@ void	drawMap(t_mlx *d)
 	}
 }
 
+void	pixPut(t_mlx *d, int x, int y, int color) {
+    char    *pix;
+
+	if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT){
+	    pix = d->i->add + (y * d->i->len + x * (d->i->bpp / 8));
+    	*(unsigned int*)pix = color;
+	}
+}
+
+//drawing line using Bresenham's line algorithm
+void	drawLine(t_mlx *data, int pdx, int pdy)
+{
+    int dx = abs(pdx - px), sx = px < pdx ? 1 : -1;
+    int dy = abs(pdy - py), sy = py < pdy ? 1 : -1;
+    int err = 2 * (dx - dy);
+	int	x = px, y = py;
+
+    while (x != pdx) {
+        pixPut(data, x, y, YELLOW);
+		if (err > 0) {y += sy; err -= 2 * dx;}
+		err += 2 * dy;
+		x += sx;
+    }
+}
+ 
 void drawPlayer(t_mlx *d)
 {
 	int	pixel;
@@ -126,10 +156,11 @@ void drawPlayer(t_mlx *d)
 		for (int j = 0; j < 8; j++) {
 			pixel = ((int)(py + i) * d->i->len + (int)(px + j) * \
 			(d->i->bpp / 8));
-			if (pixel >= 0 && pixel < WIDTH * HEIGHT * (d->i->bpp / 8)) 
+			if (pixel >= 0 && pixel < WIDTH * HEIGHT * (d->i->bpp / 8))
 				*(int *)(d->i->add + pixel) = (int)YELLOW;
 		}
 	}
+	drawLine(d);
 }
 
 void	clear_buffer(t_mlx *d)
@@ -154,16 +185,19 @@ void	display(t_mlx *d)
 	drawBackground(d);
 	drawMap(d);
 	drawPlayer(d);
+	pdx = px + 20;
+	pdy = py + 20;
+	drawLine(d, pdx, pdy);
 	if (d->win != NULL)
 		mlx_put_image_to_window(d->mlx, d->win, d->i->img, 0, 0);
 }
 
 int	buttons(t_mlx *d)
 {
-	if (d->k->w){ py-=0.4;}
-	if (d->k->s){ py+=0.4;}
-	if (d->k->d){ px+=0.4;}
-	if (d->k->a){ px-=0.4;}
+	if (d->k->a){pa-=0.1; px-=0.4;}
+	if (d->k->d){pa+=0.1; px+=0.4;}
+	if (d->k->w){pa-=0.4; py-=0.4;}
+	if (d->k->s){pa+=0.4; py+=0.4;}
 	display(d);
 }
 
@@ -199,8 +233,11 @@ int	main(void)
 
 	d.i = malloc(sizeof(t_img));
 	d.k = malloc(sizeof(t_key));
-	px = 300;
-	py = 300;
+	px = 150;
+	py = 400;
+	pa = 90;
+	pdx = 150 + 20;
+	pdy = 450 + 20;
 	lastMouseX = 512;
 	lastMouseX = 255;
 	d.k->a = false;

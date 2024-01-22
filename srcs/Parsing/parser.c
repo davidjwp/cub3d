@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/14 20:21:47 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/21 14:32:49 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/22 15:13:38 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,6 +152,8 @@ bool	is_open(t_mdata *fdata)
 }
 
 //check if there are multiple characters in the map
+//check the values of FLOOR and CEILING
+//check that the textures address is correct
 bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
 {
 	if (split == NULL)
@@ -159,6 +161,8 @@ bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
 	fdata->map = split;
 	if (ft_strncmp(ft_strchr(file_name, '.'), ".cub", 5))
 		return (err_msg("Bad extension"));
+	if ()
+		return ;
 	if (!texcol_check(fdata, -1, 0))
 		return (err_msg("Bad texcol"));
 	if (!cr_map(fdata))
