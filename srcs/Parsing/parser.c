@@ -6,11 +6,11 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/14 20:21:47 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/22 15:13:38 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/23 15:53:24 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/cub3d.h"
+#include "../../include/cub3d.h"
 
 bool	find_nchar(t_n **start, t_mdata *f)
 {
@@ -151,6 +151,14 @@ bool	is_open(t_mdata *fdata)
 	return (true);
 }
 
+//wait until we agree on the structures to make this
+//i'm not sure how to initialize the textures so this might be wrong
+//bool	texcolval_check(t_mdata *fdata)
+//{
+//	fdata->texcol[NO] = mlx_xpm_file_to_image(fdata->)
+//	return (image_check(fdata));
+//}
+
 //check if there are multiple characters in the map
 //check the values of FLOOR and CEILING
 //check that the textures address is correct
@@ -161,10 +169,10 @@ bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
 	fdata->map = split;
 	if (ft_strncmp(ft_strchr(file_name, '.'), ".cub", 5))
 		return (err_msg("Bad extension"));
-	if ()
-		return ;
 	if (!texcol_check(fdata, -1, 0))
 		return (err_msg("Bad texcol"));
+	//if (!texcolval_check(fdata))
+	//	return (err_msg("Bad texcol values"));
 	if (!cr_map(fdata))
 		return (false);
 	if (!is_open(fdata))

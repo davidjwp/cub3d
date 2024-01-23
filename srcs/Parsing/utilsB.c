@@ -6,11 +6,11 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 14:03:39 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/20 22:50:43 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/23 15:39:26 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/cub3d.h"
+#include "../../include/cub3d.h"
 
 int	gnl(int fd, char **str, int i, int n)
 {

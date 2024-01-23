@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 13:58:28 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/22 14:48:02 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/23 15:47:49 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 # include <fcntl.h>
 # include <stdbool.h>
 # include "../libft/libft.h"
-# include "../MLX42/include/MLX42/MLX42.h"
+# include <mlx.h>
 
 # define BUF_SIZ 8192
 # define WIDTH 512
@@ -52,6 +52,7 @@ typedef struct s_mdata{
 	t_n		**m_nodes;
 	int		tc_index[6];
 	t_pos	mlw;
+	void	**texcol;
 }t_mdata;
 
 typedef struct s_cub3D{
@@ -63,6 +64,15 @@ typedef struct s_lst{
 	t_n			*node;
 	struct s_lst	*next;
 }t_lst;
+
+enum	e_tex{
+	NO,
+	SO,
+	WE,
+	EA,
+	F,
+	C,		
+};
 
 /*					Parser					*/
 

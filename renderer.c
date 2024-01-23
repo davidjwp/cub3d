@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/22 21:25:11 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/23 17:55:26 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,22 @@ void	drawLine(t_mlx *data, int pdx, int pdy)
 		x += sx;
     }
 }
+
+//new this one works kinda idk check it 
+void draw_line(t_mlx *data, int px, int py, int x1, int y1, int color) {
+    int dx = abs(x1 - px), sx = px < x1 ? 1 : -1;
+    int dy = -abs(y1 - py), sy = py < y1 ? 1 : -1;
+	printf("%i %i\n", dx, dy);
+    int err = dx + dy, e2;
+
+    while (1) {
+        pixPut(data, px, py, color);
+        if (px == x1 && py == y1) break;
+        e2 = 2 * err;
+        if (e2 >= dy) { err += dy; px += sx; }
+        if (e2 <= dx) { err += dx; py += sy; }
+    }
+}
  
 void drawPlayer(t_mlx *d)
 {
@@ -155,12 +171,12 @@ void drawPlayer(t_mlx *d)
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
 			pixel = ((int)(py + i) * d->i->len + (int)(px + j) * \
+
 			(d->i->bpp / 8));
 			if (pixel >= 0 && pixel < WIDTH * HEIGHT * (d->i->bpp / 8))
 				*(int *)(d->i->add + pixel) = (int)YELLOW;
 		}
 	}
-	drawLine(d);
 }
 
 void	clear_buffer(t_mlx *d)
@@ -185,19 +201,21 @@ void	display(t_mlx *d)
 	drawBackground(d);
 	drawMap(d);
 	drawPlayer(d);
-	pdx = px + 20;
-	pdy = py + 20;
 	drawLine(d, pdx, pdy);
 	if (d->win != NULL)
 		mlx_put_image_to_window(d->mlx, d->win, d->i->img, 0, 0);
 }
 
+int FixAng(int a){ if(a>359){ a-=360;} if(a<0){ a+=360;} return a;}//keeps the angle withing 360
+float degToRad(int a) { return a*PI/180.0;}//converts an angle to a radian for cos and sin functions
+
 int	buttons(t_mlx *d)
 {
-	if (d->k->a){pa-=0.1; px-=0.4;}
-	if (d->k->d){pa+=0.1; px+=0.4;}
-	if (d->k->w){pa-=0.4; py-=0.4;}
-	if (d->k->s){pa+=0.4; py+=0.4;}
+	if (d->k->a){pa+=5; pa=FixAng(pa);pdx=px + LINE * cos(degToRad(pa)); pdy= py + LINE * sin(degToRad(pa));}
+	if (d->k->d){pa-=5; pa=FixAng(pa);pdx=px + LINE * cos(degToRad(pa)); pdy= py + LINE * sin(degToRad(pa));}
+	if (d->k->w){px+=pdx*0.01; py+=pdy*0.01;}
+	if (d->k->s){px-=pdx*0.01; py-=pdy*0.01;}
+	printf ("pa:%.1fpx:%.1fpy:%.1fpdx:%.1fpdy:%.1f\n",pa,px,py,pdx,pdy);
 	display(d);
 }
 
@@ -236,8 +254,8 @@ int	main(void)
 	px = 150;
 	py = 400;
 	pa = 90;
-	pdx = 150 + 20;
-	pdy = 450 + 20;
+	pdx = 150;
+	pdy = 450 - LINE;
 	lastMouseX = 512;
 	lastMouseX = 255;
 	d.k->a = false;

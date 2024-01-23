@@ -6,11 +6,11 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 14:26:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/20 22:50:40 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/23 15:39:24 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/cub3d.h"
+#include "../../include/cub3d.h"
 
 /*
 	0 is empty

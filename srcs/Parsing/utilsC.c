@@ -6,11 +6,11 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/17 17:39:02 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/20 22:50:48 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/23 15:39:31 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/cub3d.h"
+#include "../../include/cub3d.h"
 
 int	find_highest(int *index)
 {
