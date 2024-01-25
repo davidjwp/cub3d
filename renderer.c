@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/25 03:00:52 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/25 03:49:48 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,11 @@
 
 #define WIDTH 1024
 #define HEIGHT 512
-#define LINE 25
+#define LINE 500
 #define YELLOW 0x00FFFF00
 #define WHITE 0x00FFFFFF
+#define GREEN 0x0000FF00
+#define BLUE 0x000000FF
 
 typedef struct s_p{
 	float	x;
@@ -71,6 +73,8 @@ char map[][8] =	{{"11111111"},\
 float	px, py, pa;//point position/angle
 
 float	pdx, pdy;//delta point
+
+float	ry, rx;
 
 int	lastMouseX, lastMouseY;//mouse coordinates
 
@@ -126,104 +130,115 @@ int drawLine(t_mlx *data, int x0, int y0, int x1, int y1, int color)
 
     while (1) {
 		pixPut(data, x0, y0, color);
-        if (x0 == x1 && y0 == y1) break;
+        if (map[(abs(y0 / MAPS))][abs(x0 / MAPS)] == '1' || x0 == x1 && y0 == y1) break;
         e2 = 2 * err;
         if (e2 >= dy) { err += dy; x0 += sx; }
         if (e2 <= dx) { err += dx; y0 += sy; }
     }
 }
 
-void	rayCastDDA(t_mlx *data)
+void	bresCast(t_mlx *data)
 {
-	   float ra = pa; // Ray angle
-
-    // Calculate ray direction components
-    float dx = cos(degToRad(ra));
-    float dy = sin(degToRad(ra));
-
-    // DDA initialization
-    float xStep, yStep;
-    int mapCheckX, mapCheckY;
-    float sideDistX, sideDistY;
-    float deltaDistX = (dx == 0) ? 1e30 : fabs(1 / dx);
-    float deltaDistY = (dy == 0) ? 1e30 : fabs(1 / dy);
-    float perpWallDist;
-
-    int stepX, stepY;
-    int hit = 0;
-    int side;
-
-    // Calculate step direction and initial distances to a side
-    if (dx < 0) {
-        stepX = -1;
-        sideDistX = (px - (int)px) * deltaDistX;
-    } else {
-        stepX = 1;
-        sideDistX = ((int)px + 1.0 - px) * deltaDistX;
-    }
-    if (dy < 0) {
-        stepY = -1;
-        sideDistY = (py - (int)py) * deltaDistY;
-    } else {
-        stepY = 1;
-        sideDistY = ((int)py + 1.0 - py) * deltaDistY;
-    }
-
-    // Perform DDA
-    mapCheckX = (int)px;
-    mapCheckY = (int)py;
-    while (hit == 0) {
-        // Jump to next map square in x or y direction
-        if (sideDistX < sideDistY) {
-            sideDistX += deltaDistX;
-            mapCheckX += stepX;
-            side = 0;
-        } else {
-            sideDistY += deltaDistY;
-            mapCheckY += stepY;
-            side = 1;
-        }
-        // Check if the ray has hit a wall
-        if (mapCheckX >= 0 && mapCheckX < mapX && mapCheckY >= 0 && mapCheckY < mapY) {
-            if (map[mapCheckY][mapCheckX] == '1') hit = 1;
-        } else {
-            hit = 1; // Consider out of bounds as a 'hit' to stop the ray
-        }
-    }
-
-    // Calculate distance to the point of impact
-    if (side == 0) perpWallDist = (mapCheckX - px + (1 - stepX) / 2) / dx;
-    else perpWallDist = (mapCheckY - py + (1 - stepY) / 2) / dy;
-
-    // Draw the ray in the 2D map
-    int lineEndX = px + perpWallDist * dx;
-    int lineEndY = py + perpWallDist * dy;
-    drawLine(data, px, py, lineEndX, lineEndY, YELLOW);
+	int	oX = px, oY = py, odX = pdx, odY = pdy;
+	int	steps = 0;
+	int	rad = pa;
+	while (steps < 30){
+		rad+=1; rad=FixAng(rad); odX=oX + LINE * cos(degToRad(rad)); odY=oY+LINE*sin(degToRad(rad));
+		drawLine(data, oX, oY, odX, odY, GREEN);	
+		steps++;
+	}
+	steps=0; rad = pa;
+	while (steps < 30){
+		rad-=1; rad=FixAng(rad); odX=oX + LINE * cos(degToRad(rad)); odY=oY+LINE*sin(degToRad(rad));
+		drawLine(data, oX, oY, odX, odY, GREEN);		
+		steps++;
+	}
 }
 
-//void	rayCast(t_mlx *data)
+void	badCast(t_mlx *data)
+{
+	int dx = abs(px - pdx), sx = px < pdx ? 1 : -1;
+	int dy = -abs(py - (pdy)), sy = py < pdy ? 1 : -1;
+	int	err = dx + dy, e2;
+	float rx = px,ry = py;
+
+	while (1){
+		pixPut(data, rx, ry, YELLOW);
+		if (map[(abs(ry / MAPS))][abs(rx / MAPS)] == '1') break;//good eval
+		e2 = 2 * err;
+        if (e2 >= dy) { err += dy; rx += sx; }
+        if (e2 <= dx) { err += dx; ry += sy; }
+	}
+	
+}
+
+//void	rayCastDDA(t_mlx *data)
 //{
-//	float	ra,rx,ry,rdx,rdy, xo, yo;
-//	int		r,mx,my,mp,dof;
-//	fmax
+//	   float ra = pa; // Ray angle
 
-//	ra=pa;
-//	for (r=0;r<1;r++)
-//	{
-//		dof=0;
-//		float aTan=-1/tan(degToRad(ra));
-//		if (ra>PI){ry=(((int)py>>6)<<6)-0.0001; rx=(py-ry)*aTan+px; yo=-64; xo=-yo*aTan;}
-//		if (ra<PI){ry=(((int)py>>6)<<6)+64; rx=(py-ry)*aTan+px; yo=64; xo=-yo*aTan;}
-//		if (ra==0 || ra==PI){rx=px; ry=py;dof=8;}
-//		while(dof<8){ 
-//			mx=(int)(rx)>>6; my=(int)(ry)>>6; mp=my*mapX+mx;                     
-//			if(mp>0 && mp<mapX*mapY && map[mp]=='1'){ dof=8;}//hit         
-//			else{ rx+=xo; ry+=yo; dof+=1;}                                               //check next horizontal
-//		}
-//		drawLine(data, px, py, rx, ry, YELLOW);
-//	}
+//    // Calculate ray direction components
+//    float dx = cos(degToRad(ra));
+//    float dy = sin(degToRad(ra));
+
+//    // DDA initialization
+//    float xStep, yStep;
+//    int mapCheckX, mapCheckY;
+//    float sideDistX, sideDistY;
+//    float deltaDistX = (dx == 0) ? 1e30 : fabs(1 / dx);
+//    float deltaDistY = (dy == 0) ? 1e30 : fabs(1 / dy);
+//    float perpWallDist;
+
+//    int stepX, stepY;
+//    int hit = 0;
+//    int side;
+
+//    // Calculate step direction and initial distances to a side
+//    if (dx < 0) {
+//        stepX = -1;
+//        sideDistX = (px - (int)px) * deltaDistX;
+//    } else {
+//        stepX = 1;
+//        sideDistX = ((int)px + 1.0 - px) * deltaDistX;
+//    }
+//    if (dy < 0) {
+//        stepY = -1;
+//        sideDistY = (py - (int)py) * deltaDistY;
+//    } else {
+//        stepY = 1;
+//        sideDistY = ((int)py + 1.0 - py) * deltaDistY;
+//    }
+
+//    // Perform DDA
+//    mapCheckX = (int)px;
+//    mapCheckY = (int)py;
+//    while (hit == 0) {
+//        // Jump to next map square in x or y direction
+//        if (sideDistX < sideDistY) {
+//            sideDistX += deltaDistX;
+//            mapCheckX += stepX;
+//            side = 0;
+//        } else {
+//            sideDistY += deltaDistY;
+//            mapCheckY += stepY;
+//            side = 1;
+//        }
+//        // Check if the ray has hit a wall
+//        if (mapCheckX >= 0 && mapCheckX < mapX && mapCheckY >= 0 && mapCheckY < mapY) {
+//            if (map[mapCheckY][mapCheckX] == '1') hit = 1;
+//        } else {
+//            hit = 1; // Consider out of bounds as a 'hit' to stop the ray
+//        }
+//    }
+
+//    // Calculate distance to the point of impact
+//    if (side == 0) perpWallDist = (mapCheckX - px + (1 - stepX) / 2) / dx;
+//    else perpWallDist = (mapCheckY - py + (1 - stepY) / 2) / dy;
+
+//    // Draw the ray in the 2D map
+//    int lineEndX = px + perpWallDist * dx;
+//    int lineEndY = py + perpWallDist * dy;
+//    drawLine(data, px, py, lineEndX, lineEndY, YELLOW);
 //}
-
 
 void	drawBackground(t_mlx *d)
 {
@@ -279,8 +294,8 @@ void	display(t_mlx *d)
 	drawBackground(d);
 	drawMap(d);
 	drawPlayer(d, py, px);
-	drawLine(d,px ,py,pdx,pdy,YELLOW);
-	rayCastDDA(d);
+	drawLine(d,px ,py,pdx,pdy,BLUE);
+	bresCast(d);
 	if (d->win != NULL)
 		mlx_put_image_to_window(d->mlx, d->win, d->i->img[d->i->current], 0, 0);
 	swap_buffers(d);
@@ -289,10 +304,10 @@ void	display(t_mlx *d)
 
 int	buttons(t_mlx *d)
 {
-	if (d->k->a){pa+=5; pa=FixAng(pa);pdx=px + LINE * cos(degToRad(pa)); pdy= py + LINE * sin(degToRad(pa));}
-	if (d->k->d){pa-=5; pa=FixAng(pa);pdx=px + LINE * cos(degToRad(pa)); pdy= py + LINE * sin(degToRad(pa));}
-	if (d->k->w){px+=cos(degToRad(pa)) * 1.5; py+=sin(degToRad(pa)) * 1.5;pdx+=cos(degToRad(pa)) * 1.5; pdy+=sin(degToRad(pa)) * 1.5;}
-	if (d->k->s){px-=cos(degToRad(pa)) * 1.5; py-=sin(degToRad(pa)) * 1.5;pdx-=cos(degToRad(pa)) * 1.5; pdy-=sin(degToRad(pa)) * 1.5;}
+	if (d->k->d){pa+=3; pa=FixAng(pa);pdx=px + LINE * cos(degToRad(pa)); pdy= py + LINE * sin(degToRad(pa));}
+	if (d->k->a){pa-=3; pa=FixAng(pa);pdx=px + LINE * cos(degToRad(pa)); pdy= py + LINE * sin(degToRad(pa));}
+	if (d->k->w){px+=cos(degToRad(pa)) * 2.5; py+=sin(degToRad(pa)) * 2.5;pdx+=cos(degToRad(pa)) * 2.5; pdy+=sin(degToRad(pa)) * 2.5;}
+	if (d->k->s){px-=cos(degToRad(pa)) * 2.5; py-=sin(degToRad(pa)) * 2.5;pdx-=cos(degToRad(pa)) * 2.5; pdy-=sin(degToRad(pa)) * 2.5;}
 	display(d);
 }
 
