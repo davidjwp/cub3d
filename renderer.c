@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/23 17:55:26 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/25 02:30:08 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,22 @@
 
 #define WIDTH 1024
 #define HEIGHT 512
-#define LINE 16
+#define LINE 25
 #define YELLOW 0x00FFFF00
 #define WHITE 0x00FFFFFF
 
+typedef struct s_p{
+	float	x;
+	float	y;
+}t_p;
+
 typedef struct s_img{
-	void	*img;
-	char	*add;
+	void	*img[2];
+	char	*add[2];
 	int		bpp;
 	int		len;
 	int		end;
+	int		current;
 }t_img;
 
 typedef struct s_key{
@@ -51,7 +57,7 @@ typedef struct s_mlx{
 }t_mlx;
 
 #define PI 3.14159
-
+#define MAPS 64
 //this map is already created in the main program btw
 char map[][8] =	{{"11111111"},\
 				 {"10100001"},\
@@ -68,7 +74,27 @@ float	pdx, pdy;//delta point
 
 int	lastMouseX, lastMouseY;//mouse coordinates
 
-int	mapH = 8, mapW = 8, mapS = 64;
+int	mapX = 8, mapY = 8;
+
+int FixAng(int a){ if(a>359){ a-=360;} if(a<0){ a+=360;} return a;}//keeps the angle withing 360
+float degToRad(int a) { return a*PI/180.0;}//converts an angle to a radian for cos and sin functions
+
+void swap_buffers(t_mlx *data) {
+    if (data->win != NULL)
+		mlx_put_image_to_window(data->mlx, data->win, data->i->img[data->i->current], 0, 0);
+    data->i->current = !data->i->current; // Swap buffer index
+    mlx_destroy_image(data->mlx, data->i->img[data->i->current]); // Destroy the old buffer
+    data->i->img[data->i->current] = mlx_new_image(data->mlx, WIDTH, HEIGHT); // Create a new buffer
+    data->i->add[data->i->current] = mlx_get_data_addr(data->i->img[data->i->current], &data->i->bpp, &data->i->len, &data->i->end);
+}
+
+void init_images(t_mlx *data) {
+    for (int i = 0; i < 2; i++) {
+        data->i->img[i] = mlx_new_image(data->mlx, WIDTH, HEIGHT);
+        data->i->add[i] = mlx_get_data_addr(data->i->img[i], &data->i->bpp, &data->i->len, &data->i->end);
+    }
+    data->i->current = 0;
+}
 
 int	close_win(int key, void *param)
 {
@@ -76,146 +102,133 @@ int	close_win(int key, void *param)
 
 	d = (t_mlx *)param;
 	if (key == XK_Escape){
-		mlx_destroy_window(d->mlx, d->win);
 		mlx_loop_end(d->mlx);
+		mlx_destroy_window(d->mlx, d->win);
 		d->win = NULL;
 	}
 	return (0);
 }
 
+void pixPut(t_mlx *d, int x, int y, int color)
+{
+	if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
+		int pixelPos = y * d->i->len + x * (d->i->bpp / 8);
+		char *dst = d->i->add[d->i->current] + pixelPos;
+		*(unsigned int*)dst = color;
+	}
+}
+
+int drawLine(t_mlx *data, int x0, int y0, int x1, int y1, int color)
+{
+    int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    int dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    int err = dx + dy, e2;
+
+    while (1) {
+		pixPut(data, x0, y0, color);
+        if (x0 == x1 && y0 == y1) break;
+        e2 = 2 * err;
+        if (e2 >= dy) { err += dy; x0 += sx; }
+        if (e2 <= dx) { err += dx; y0 += sy; }
+    }
+}
+
+void	rayCastDDA(t_mlx *data)
+{
+	int	dx = px -
+}
+
+//void	rayCast(t_mlx *data)
+//{
+//	float	ra,rx,ry,rdx,rdy, xo, yo;
+//	int		r,mx,my,mp,dof;
+//	fmax
+
+//	ra=pa;
+//	for (r=0;r<1;r++)
+//	{
+//		dof=0;
+//		float aTan=-1/tan(degToRad(ra));
+//		if (ra>PI){ry=(((int)py>>6)<<6)-0.0001; rx=(py-ry)*aTan+px; yo=-64; xo=-yo*aTan;}
+//		if (ra<PI){ry=(((int)py>>6)<<6)+64; rx=(py-ry)*aTan+px; yo=64; xo=-yo*aTan;}
+//		if (ra==0 || ra==PI){rx=px; ry=py;dof=8;}
+//		while(dof<8){ 
+//			mx=(int)(rx)>>6; my=(int)(ry)>>6; mp=my*mapX+mx;                     
+//			if(mp>0 && mp<mapX*mapY && map[mp]=='1'){ dof=8;}//hit         
+//			else{ rx+=xo; ry+=yo; dof+=1;}                                               //check next horizontal
+//		}
+//		drawLine(data, px, py, rx, ry, YELLOW);
+//	}
+//}
+
+
 void	drawBackground(t_mlx *d)
 {
 	int	pixel;
 
-	for (int i = 0; i < HEIGHT; i++) {
-		for (int j = 0; j < WIDTH; j++) {
-			pixel = (i * d->i->len + j * (d->i->bpp / 8));
-			if (pixel >= 0 && pixel < WIDTH * HEIGHT * (d->i->bpp / 8)) 
-				*(int *)(d->i->add + pixel) = 0x00808080;
-		}
-	}
+	for (int i = 0; i < HEIGHT; i++) 
+		for (int j = 0; j < WIDTH; j++) 
+			pixPut(d, j, i, 0x00808080);
 }
 
 void	drawNode(t_mlx *d, int size, int y, int x, int color)
 {
 	int	pixel;
 
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++) {
-			pixel = ((int)(y + i) * d->i->len + (int)(x + j) * \
-			(d->i->bpp / 8));
-			if (pixel >= 0 && pixel < WIDTH * HEIGHT * (d->i->bpp / 8)) 
-				*(int *)(d->i->add + pixel) = color;
-		}
-	}
+	for (int i = 0; i < size; i++)
+		for (int j = 0; j < size; j++)
+			pixPut(d, j + x, i + y, color);
 }
 
 void	drawMap(t_mlx *d)
 {
 
-	for (int i = 0; i < mapH; i++){
-		for(int y = 0; y < mapW; y++){
+	for (int i = 0; i < mapY; i++){
+		for(int y = 0; y < mapX; y++){
 			if (map[i][y]=='1')
-				drawNode(d, mapS - 2, i * mapS, y * mapS, WHITE);
+				drawNode(d, MAPS - 2, i * MAPS, y * MAPS, WHITE);
 			else
-				drawNode(d, mapS - 2, i * mapS, y * mapS, 0x00000000);
+				drawNode(d, MAPS - 2, i * MAPS, y * MAPS, 0x00000000);
 		}
 	}
 }
 
-void	pixPut(t_mlx *d, int x, int y, int color) {
-    char    *pix;
-
-	if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT){
-	    pix = d->i->add + (y * d->i->len + x * (d->i->bpp / 8));
-    	*(unsigned int*)pix = color;
-	}
-}
-
-//drawing line using Bresenham's line algorithm
-void	drawLine(t_mlx *data, int pdx, int pdy)
+void drawPlayer(t_mlx *d, int y, int x)
 {
-    int dx = abs(pdx - px), sx = px < pdx ? 1 : -1;
-    int dy = abs(pdy - py), sy = py < pdy ? 1 : -1;
-    int err = 2 * (dx - dy);
-	int	x = px, y = py;
+	t_p	s = (t_p){x-4,y-4};
+	t_p	e = (t_p){s.x+8,s.y+8};
 
-    while (x != pdx) {
-        pixPut(data, x, y, YELLOW);
-		if (err > 0) {y += sy; err -= 2 * dx;}
-		err += 2 * dy;
-		x += sx;
-    }
-}
-
-//new this one works kinda idk check it 
-void draw_line(t_mlx *data, int px, int py, int x1, int y1, int color) {
-    int dx = abs(x1 - px), sx = px < x1 ? 1 : -1;
-    int dy = -abs(y1 - py), sy = py < y1 ? 1 : -1;
-	printf("%i %i\n", dx, dy);
-    int err = dx + dy, e2;
-
-    while (1) {
-        pixPut(data, px, py, color);
-        if (px == x1 && py == y1) break;
-        e2 = 2 * err;
-        if (e2 >= dy) { err += dy; px += sx; }
-        if (e2 <= dx) { err += dx; py += sy; }
-    }
-}
- 
-void drawPlayer(t_mlx *d)
-{
-	int	pixel;
-
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 8; j++) {
-			pixel = ((int)(py + i) * d->i->len + (int)(px + j) * \
-
-			(d->i->bpp / 8));
-			if (pixel >= 0 && pixel < WIDTH * HEIGHT * (d->i->bpp / 8))
-				*(int *)(d->i->add + pixel) = (int)YELLOW;
+	while (s.y < e.y){
+		while (s.x < e.x){
+			pixPut(d, s.x, s.y, YELLOW);
+			s.x++;
 		}
-	}
-}
-
-void	clear_buffer(t_mlx *d)
-{
-	int	color = 0x00000000;
-	int	pixel;
-
-	for (int i = 0; i < HEIGHT; i++) {
-		for (int y = 0; y < WIDTH; y++) {
-			pixel = (i * d->i->len + y * (d->i->bpp / 8));
-			if (pixel >= 0 && pixel < WIDTH * HEIGHT * (d->i->bpp / 8)) 
-				*(int *)(d->i->add + pixel) = color;
-		}
+		s.x = x - 4;
+		s.y++;
 	}
 }
 
 void	display(t_mlx *d)
 {
-	clear_buffer(d);
 	if (d->win != NULL)
-		mlx_put_image_to_window(d->mlx, d->win, d->i->img, 0, 0);
+		mlx_put_image_to_window(d->mlx, d->win, d->i->img[d->i->current], 0, 0);
+	//printf("px:%.1f||py:%.1f||pa:%.1f\tpdx:%.1f||pdy:%.1f\n", px, py, pa, pdx, pdy);
 	drawBackground(d);
 	drawMap(d);
-	drawPlayer(d);
-	drawLine(d, pdx, pdy);
+	drawPlayer(d, py, px);
+	drawLine(d,px ,py,pdx,pdy,YELLOW);
 	if (d->win != NULL)
-		mlx_put_image_to_window(d->mlx, d->win, d->i->img, 0, 0);
+		mlx_put_image_to_window(d->mlx, d->win, d->i->img[d->i->current], 0, 0);
+	swap_buffers(d);
 }
 
-int FixAng(int a){ if(a>359){ a-=360;} if(a<0){ a+=360;} return a;}//keeps the angle withing 360
-float degToRad(int a) { return a*PI/180.0;}//converts an angle to a radian for cos and sin functions
 
 int	buttons(t_mlx *d)
 {
 	if (d->k->a){pa+=5; pa=FixAng(pa);pdx=px + LINE * cos(degToRad(pa)); pdy= py + LINE * sin(degToRad(pa));}
 	if (d->k->d){pa-=5; pa=FixAng(pa);pdx=px + LINE * cos(degToRad(pa)); pdy= py + LINE * sin(degToRad(pa));}
-	if (d->k->w){px+=pdx*0.01; py+=pdy*0.01;}
-	if (d->k->s){px-=pdx*0.01; py-=pdy*0.01;}
-	printf ("pa:%.1fpx:%.1fpy:%.1fpdx:%.1fpdy:%.1f\n",pa,px,py,pdx,pdy);
+	if (d->k->w){px+=cos(degToRad(pa)) * 1.5; py+=sin(degToRad(pa)) * 1.5;pdx+=cos(degToRad(pa)) * 1.5; pdy+=sin(degToRad(pa)) * 1.5;}
+	if (d->k->s){px-=cos(degToRad(pa)) * 1.5; py-=sin(degToRad(pa)) * 1.5;pdx-=cos(degToRad(pa)) * 1.5; pdy-=sin(degToRad(pa)) * 1.5;}
 	display(d);
 }
 
@@ -244,6 +257,14 @@ int key_release(int key, void *param) {
     return (0);
 }
 
+void	destroyAll(t_mlx *d){
+	for (int i = 0; i < 2; i++)
+		mlx_destroy_image(d->mlx, d->i->img[i]);
+    mlx_destroy_display(d->mlx);
+    free(d->mlx);
+	free(d->k);
+	free(d->i);
+}
 
 int	main(void)
 {
@@ -251,13 +272,10 @@ int	main(void)
 
 	d.i = malloc(sizeof(t_img));
 	d.k = malloc(sizeof(t_key));
-	px = 150;
-	py = 400;
-	pa = 90;
-	pdx = 150;
-	pdy = 450 - LINE;
+	px=150.0; py=400.0; pa=0;
+	pdx=px+LINE, pdy=py;
 	lastMouseX = 512;
-	lastMouseX = 255;
+	lastMouseY = 255;
 	d.k->a = false;
 	d.k->w = false;
 	d.k->d = false;
@@ -266,22 +284,15 @@ int	main(void)
 /*			initialization				*/
 	d.mlx = mlx_init();
 	d.win = mlx_new_window(d.mlx, WIDTH, HEIGHT, "window");
-	d.i->img = mlx_new_image(d.mlx, WIDTH, HEIGHT);
-	d.i->add = mlx_get_data_addr(d.i->img, &d.i->bpp, &d.i->len, &d.i->end);
+	init_images(&d);
 
 	mlx_hook(d.win, KeyPress, KeyPressMask, key_press, &d);
 	mlx_hook(d.win, KeyRelease, KeyReleaseMask, key_release, &d);
 	mlx_loop_hook(d.mlx, buttons, &d);
 	display(&d);
 
-
-
 	mlx_loop(d.mlx);
 /*				clean up				*/
-	mlx_destroy_image(d.mlx, d.i->img);
-	mlx_destroy_display(d.mlx);
-	free(d.k);
-	free(d.i);
-	free(d.mlx);
+	destroyAll(&d);
 	return (0);
 }
