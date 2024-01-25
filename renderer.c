@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/25 20:11:01 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/25 20:17:28 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,8 +166,8 @@ void drawVerticalSegment(t_mlx *data, int x, int lineHeight) {
 void	draw3Dmap(t_mlx *data, float x, float y, float ra)
 {
 	float dist = sqrt((x - px) * (x - px) + (y - py) * (y - py));
-	//float correctedDist = dist * -cos(pa - ra); // 'ra' is the ray's angle, 'pa' is the player's angle
-	int lineHeight = (int)(HEIGHT / dist);
+	float correctedDist = dist * -cos(ra - pa); // 'ra' is the ray's angle, 'pa' is the player's angle
+	int lineHeight = (int)(HEIGHT / correctedDist);
 
 
 	drawVerticalSegment(data, x, lineHeight * 32);
