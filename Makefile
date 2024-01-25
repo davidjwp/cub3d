@@ -6,10 +6,12 @@
 #    By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/16 14:07:50 by djacobs           #+#    #+#              #
-#    Updated: 2024/01/21 15:13:21 by djacobs          ###   ########.fr        #
+#    Updated: 2024/01/25 15:50:14 by djacobs          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+#add rule for compiling on dells vs macs that change the speed of the character
+#and the speed of looking left and right
 NAME		:= test
 CC			:= gcc
 CFLAGS		:= -g3 -Wall -Werror -Wextra

@@ -49,25 +49,46 @@ void my_mlx_pixel_put(t_data *data, int x, int y, int color) {
     }
 }
 
-int mlx_line_put(t_data *data, int x0, int y0, int x1, int y1, int color) {
-    int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-    int dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-    int err = dx + dy, e2;
+int lineDDA(t_data *d, int x0, int y0, int x1, int y1, int color)
+{
+    int dx = x1 - x0;
+    int dy = y1 - y0;
 
-    while (1) {
-		my_mlx_pixel_put(data, x0, y0, color);
-        if (x0 == x1 && y0 == y1) break;
-        e2 = 2 * err;
-        if (e2 >= dy) { err += dy; x0 += sx; }
-        if (e2 <= dx) { err += dx; y0 += sy; }
+    int steps = fmax(abs(dx), abs(dy));
+
+    float xIncrement = dx / (float)steps;
+    float yIncrement = dy / (float)steps;
+
+    float x = x0;
+    float y = y0;
+
+    for (int i = 0; i <= steps; i++) {
+        my_mlx_pixel_put(d, round(x), round(y), color);
+        x += xIncrement;
+        y += yIncrement;
     }
 }
+//int mlx_line_put(t_data *data, int x0, int y0, int x1, int y1, int color) {
+//    int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+//    int dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+//    int err = dx + dy, e2;
+
+//    while (1) {
+//		my_mlx_pixel_put(data, x0, y0, color);
+//        if (x0 == x1 && y0 == y1) break;
+//        e2 = 2 * err;
+//        if (e2 >= dy) { err += dy; x0 += sx; }
+//        if (e2 <= dx) { err += dx; y0 += sy; }
+//    }
+//}
 
 // Draw a line on the window
 void draw_line(t_data *data) {
     //mlx_clear_window(data->mlx, data->win);
 
-    mlx_line_put(data, data->x0, data->y0, data->x1, data->y1, 0x00FFFFFF);  // White line
+    //mlx_line_put(data, data->x0, data->y0, data->x1, data->y1, 0x00FFFFFF);  // White line
+    lineDDA(data, data->x0, data->y0, data->x1, data->y1, 0x00FFFFFF);
+
 	//mlx_put_image_to_window(data->mlx, data->win, data->img, 0,0);
 	//clear_buffer(data);
 }
@@ -88,7 +109,7 @@ void rotate_line(t_data *data) {
     data->y1 = originalX1 * sin(rad) + originalY1 * cos(rad) + pivotY;
 
     // Increment angle
-    data->angle += 1;
+    data->angle += 0.1;
     if (data->angle >= 360.0) data->angle = 0.0;
 }
 
