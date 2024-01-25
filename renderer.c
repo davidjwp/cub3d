@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/25 03:49:48 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/25 04:27:12 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ void	bresCast(t_mlx *data)
 {
 	int	oX = px, oY = py, odX = pdx, odY = pdy;
 	int	steps = 0;
-	int	rad = pa;
+	float	rad = pa;
 	while (steps < 30){
 		rad+=1; rad=FixAng(rad); odX=oX + LINE * cos(degToRad(rad)); odY=oY+LINE*sin(degToRad(rad));
 		drawLine(data, oX, oY, odX, odY, GREEN);	
