@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/25 02:30:08 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/25 03:00:52 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,70 @@ int drawLine(t_mlx *data, int x0, int y0, int x1, int y1, int color)
 
 void	rayCastDDA(t_mlx *data)
 {
-	int	dx = px -
+	   float ra = pa; // Ray angle
+
+    // Calculate ray direction components
+    float dx = cos(degToRad(ra));
+    float dy = sin(degToRad(ra));
+
+    // DDA initialization
+    float xStep, yStep;
+    int mapCheckX, mapCheckY;
+    float sideDistX, sideDistY;
+    float deltaDistX = (dx == 0) ? 1e30 : fabs(1 / dx);
+    float deltaDistY = (dy == 0) ? 1e30 : fabs(1 / dy);
+    float perpWallDist;
+
+    int stepX, stepY;
+    int hit = 0;
+    int side;
+
+    // Calculate step direction and initial distances to a side
+    if (dx < 0) {
+        stepX = -1;
+        sideDistX = (px - (int)px) * deltaDistX;
+    } else {
+        stepX = 1;
+        sideDistX = ((int)px + 1.0 - px) * deltaDistX;
+    }
+    if (dy < 0) {
+        stepY = -1;
+        sideDistY = (py - (int)py) * deltaDistY;
+    } else {
+        stepY = 1;
+        sideDistY = ((int)py + 1.0 - py) * deltaDistY;
+    }
+
+    // Perform DDA
+    mapCheckX = (int)px;
+    mapCheckY = (int)py;
+    while (hit == 0) {
+        // Jump to next map square in x or y direction
+        if (sideDistX < sideDistY) {
+            sideDistX += deltaDistX;
+            mapCheckX += stepX;
+            side = 0;
+        } else {
+            sideDistY += deltaDistY;
+            mapCheckY += stepY;
+            side = 1;
+        }
+        // Check if the ray has hit a wall
+        if (mapCheckX >= 0 && mapCheckX < mapX && mapCheckY >= 0 && mapCheckY < mapY) {
+            if (map[mapCheckY][mapCheckX] == '1') hit = 1;
+        } else {
+            hit = 1; // Consider out of bounds as a 'hit' to stop the ray
+        }
+    }
+
+    // Calculate distance to the point of impact
+    if (side == 0) perpWallDist = (mapCheckX - px + (1 - stepX) / 2) / dx;
+    else perpWallDist = (mapCheckY - py + (1 - stepY) / 2) / dy;
+
+    // Draw the ray in the 2D map
+    int lineEndX = px + perpWallDist * dx;
+    int lineEndY = py + perpWallDist * dy;
+    drawLine(data, px, py, lineEndX, lineEndY, YELLOW);
 }
 
 //void	rayCast(t_mlx *data)
@@ -217,6 +280,7 @@ void	display(t_mlx *d)
 	drawMap(d);
 	drawPlayer(d, py, px);
 	drawLine(d,px ,py,pdx,pdy,YELLOW);
+	rayCastDDA(d);
 	if (d->win != NULL)
 		mlx_put_image_to_window(d->mlx, d->win, d->i->img[d->i->current], 0, 0);
 	swap_buffers(d);
