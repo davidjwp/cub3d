@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/25 20:17:28 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/26 01:18:44 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 #define WIDTH 1024
 #define HEIGHT 512
@@ -89,20 +90,32 @@ int	mapX = 8, mapY = 8;
 int FixAng(int a){ if(a>359){ a-=360;} if(a<0){ a+=360;} return a;}//keeps the angle withing 360
 float degToRad(int a) { return a*PI/180.0;}//converts an angle to a radian for cos and sin functions
 
-void swap_buffers(t_mlx *data) {
-    if (data->win != NULL){
-		mlx_put_image_to_window(data->mlx, data->win, data->i->img[data->i->current], 0, 0);
-		mlx_put_image_to_window(data->mlx, data->win, data->i3D->img[data->i3D->current], 512, 0);
-		
+int	close_win(int key, void *param)
+{
+	t_mlx	*d;
+
+	d = (t_mlx *)param;
+	if (key == XK_Escape){
+		mlx_loop_end(d->mlx);
+		mlx_destroy_window(d->mlx, d->win);
+		d->win = NULL;
 	}
+	return (0);
+}
+
+void swap_buffers(t_mlx *data) {
+    if (data->win != NULL)
+		mlx_put_image_to_window(data->mlx, data->win, data->i->img[data->i->current], 0, 0);
     data->i->current = !data->i->current; // Swap buffer index
     mlx_destroy_image(data->mlx, data->i->img[data->i->current]); // Destroy the old buffer
     data->i->img[data->i->current] = mlx_new_image(data->mlx, WIDTH, HEIGHT); // Create a new buffer
+	if (data->win != NULL)
+		mlx_put_image_to_window(data->mlx, data->win, data->i3D->img[data->i3D->current], 512, 0);
     data->i->add[data->i->current] = mlx_get_data_addr(data->i->img[data->i->current], &data->i->bpp, &data->i->len, &data->i->end);
     data->i3D->current = !data->i3D->current; // Swap buffer index
     mlx_destroy_image(data->mlx, data->i3D->img[data->i3D->current]); // Destroy the old buffer
     data->i3D->img[data->i3D->current] = mlx_new_image(data->mlx, WIDTH, HEIGHT); // Create a new buffer
-    data->i3D->add[data->i3D->current] = mlx_get_data_addr(data->i3D->img[data->i3D->current], &data->i3D->bpp, &data->i3D->len, &data->i->end);
+    data->i3D->add[data->i3D->current] = mlx_get_data_addr(data->i3D->img[data->i3D->current], &data->i3D->bpp, &data->i3D->len, &data->i3D->end);
 }
 
 void init_images(t_mlx *data) {
@@ -118,18 +131,6 @@ void init_images(t_mlx *data) {
 	data->i3D->current = 0;
 }
 
-int	close_win(int key, void *param)
-{
-	t_mlx	*d;
-
-	d = (t_mlx *)param;
-	if (key == XK_Escape){
-		mlx_loop_end(d->mlx);
-		mlx_destroy_window(d->mlx, d->win);
-		d->win = NULL;
-	}
-	return (0);
-}
 
 void pixPut(t_mlx *d, int x, int y, int color)
 {
@@ -154,6 +155,8 @@ void drawVerticalSegment(t_mlx *data, int x, int lineHeight) {
     if (drawStart < 0) drawStart = 0;
     int drawEnd = lineHeight / 2 + HEIGHT / 2;
     if (drawEnd >= HEIGHT) drawEnd = HEIGHT - 1;
+	if (data->k->p)
+		printf("ray%i\theight:%i\tdrawdelta%i\n", ray, lineHeight, abs(drawStart - drawEnd));
 
     for (int i = 0; i < 8; i++){
 		for (int y = drawStart; y < drawEnd; y++) {
@@ -166,13 +169,13 @@ void drawVerticalSegment(t_mlx *data, int x, int lineHeight) {
 void	draw3Dmap(t_mlx *data, float x, float y, float ra)
 {
 	float dist = sqrt((x - px) * (x - px) + (y - py) * (y - py));
-	float correctedDist = dist * -cos(ra - pa); // 'ra' is the ray's angle, 'pa' is the player's angle
-	int lineHeight = (int)(HEIGHT / correctedDist);
+	//float correctedDist = dist * -cos(ra - pa); // 'ra' is the ray's angle, 'pa' is the player's angle
+	int lineHeight = (int)(HEIGHT / dist);
 
 
-	drawVerticalSegment(data, x, lineHeight * 32);
-	if (data->k->p)
-		printf ("ray:%i\theight:%i\tdist:%.1f\n", ray, lineHeight, dist);
+	drawVerticalSegment(data, x, abs(lineHeight * 32));
+	//if (data->k->p)
+	//	printf ("ray:%i\theight:%i\tdist:%.1f\n", ray, lineHeight, dist);
 }
 
 //bresenham draw
@@ -209,76 +212,6 @@ void bresCast(t_mlx *data) {
     }
 	ray = 0;
 }
-
-
-
-//void	rayCastDDA(t_mlx *data)
-//{
-//	   float ra = pa; // Ray angle
-
-//    // Calculate ray direction components
-//    float dx = cos(degToRad(ra));
-//    float dy = sin(degToRad(ra));
-
-//    // DDA initialization
-//    float xStep, yStep;
-//    int mapCheckX, mapCheckY;
-//    float sideDistX, sideDistY;
-//    float deltaDistX = (dx == 0) ? 1e30 : fabs(1 / dx);
-//    float deltaDistY = (dy == 0) ? 1e30 : fabs(1 / dy);
-//    float perpWallDist;
-
-//    int stepX, stepY;
-//    int hit = 0;
-//    int side;
-
-//    // Calculate step direction and initial distances to a side
-//    if (dx < 0) {
-//        stepX = -1;
-//        sideDistX = (px - (int)px) * deltaDistX;
-//    } else {
-//        stepX = 1;
-//        sideDistX = ((int)px + 1.0 - px) * deltaDistX;
-//    }
-//    if (dy < 0) {
-//        stepY = -1;
-//        sideDistY = (py - (int)py) * deltaDistY;
-//    } else {
-//        stepY = 1;
-//        sideDistY = ((int)py + 1.0 - py) * deltaDistY;
-//    }
-
-//    // Perform DDA
-//    mapCheckX = (int)px;
-//    mapCheckY = (int)py;
-//    while (hit == 0) {
-//        // Jump to next map square in x or y direction
-//        if (sideDistX < sideDistY) {
-//            sideDistX += deltaDistX;
-//            mapCheckX += stepX;
-//            side = 0;
-//        } else {
-//            sideDistY += deltaDistY;
-//            mapCheckY += stepY;
-//            side = 1;
-//        }
-//        // Check if the ray has hit a wall
-//        if (mapCheckX >= 0 && mapCheckX < mapX && mapCheckY >= 0 && mapCheckY < mapY) {
-//            if (map[mapCheckY][mapCheckX] == '1') hit = 1;
-//        } else {
-//            hit = 1; // Consider out of bounds as a 'hit' to stop the ray
-//        }
-//    }
-
-//    // Calculate distance to the point of impact
-//    if (side == 0) perpWallDist = (mapCheckX - px + (1 - stepX) / 2) / dx;
-//    else perpWallDist = (mapCheckY - py + (1 - stepY) / 2) / dy;
-
-//    // Draw the ray in the 2D map
-//    int lineEndX = px + perpWallDist * dx;
-//    int lineEndY = py + perpWallDist * dy;
-//    drawLine(data, px, py, lineEndX, lineEndY, YELLOW);
-//}
 
 void	drawBackground(t_mlx *d)
 {
@@ -328,7 +261,7 @@ void drawPlayer(t_mlx *d, int y, int x)
 
 void	display(t_mlx *d)
 {
-	if (d->win != NULL) mlx_put_image_to_window(d->mlx, d->win, d->i->img[d->i->current], 0, 0);
+	//if (d->win != NULL) mlx_put_image_to_window(d->mlx, d->win, d->i->img[d->i->current], 0, 0);
 	//printf("px:%.1f||py:%.1f||pa:%.1f\tpdx:%.1f||pdy:%.1f\n", px, py, pa, pdx, pdy);
 	drawBackground(d);
 	drawMap(d);
@@ -336,7 +269,6 @@ void	display(t_mlx *d)
 	drawLine(d,px ,py,pdx,pdy,BLUE, pa);
 	bresCast(d);
 	swap_buffers(d);
-	
 }
 
 
