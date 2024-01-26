@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:49 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/23 15:53:12 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/26 16:56:06 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	main(void)
 	//	return (err_msg("mlx init fail"), -1);
 
 	//main data structure
-	fdata = (t_mdata){NULL, NULL, NULL, {0, 0, 0, 0, 0, 0}, {0, 0}};
+	fdata = (t_mdata){NULL, NULL, NULL, {0, 0, 0, 0, 0, 0}, {0, 0}, NULL};
 	fdata.tex = malloc(sizeof(char *) * 7);
 	if (!fdata.tex)
 		return (err_msg("malloc fail"), -1);

@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 13:58:28 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/23 15:47:49 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/26 16:54:55 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ typedef struct s_mdata{
 
 typedef struct s_cub3D{
 	t_mdata	fdata;
-	mlx_t	*mlx;
+	//mlx_t	*mlx;
 }t_cub;
 
 typedef struct s_lst{
