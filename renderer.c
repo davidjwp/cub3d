@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/26 01:18:44 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/26 16:26:17 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ typedef struct s_mlx{
 
 #define PI 3.14159
 #define MAPS 64
-#define RS 1
+#define RS (float)0.5
 #define MS 1
 //this map is already created in the main program btw
 char map[][8] =	{{"11111111"},\
@@ -87,7 +87,7 @@ int	lastMouseX, lastMouseY;//mouse coordinates
 
 int	mapX = 8, mapY = 8;
 
-int FixAng(int a){ if(a>359){ a-=360;} if(a<0){ a+=360;} return a;}//keeps the angle withing 360
+float FixAng(float a){if(a>359){ a-=360;}if(a<0){ a+=360;}return a;}//keeps the angle withing 360
 float degToRad(int a) { return a*PI/180.0;}//converts an angle to a radian for cos and sin functions
 
 int	close_win(int key, void *param)
@@ -131,7 +131,6 @@ void init_images(t_mlx *data) {
 	data->i3D->current = 0;
 }
 
-
 void pixPut(t_mlx *d, int x, int y, int color)
 {
 	if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
@@ -150,7 +149,7 @@ void pixPut3D(t_mlx *d, int x, int y, int color)
 	}
 }
 
-void drawVerticalSegment(t_mlx *data, int x, int lineHeight) {
+void drawVerticalSegment(t_mlx *data, int lineHeight, int color) {
     int drawStart = -lineHeight / 2 + HEIGHT / 2;
     if (drawStart < 0) drawStart = 0;
     int drawEnd = lineHeight / 2 + HEIGHT / 2;
@@ -160,20 +159,19 @@ void drawVerticalSegment(t_mlx *data, int x, int lineHeight) {
 
     for (int i = 0; i < 8; i++){
 		for (int y = drawStart; y < drawEnd; y++) {
-	        pixPut3D(data, x, y, GREEN); // Replace WALL_COLOR with actual color or texture
+	        pixPut3D(data, (ray + (i)) + (WIDTH / 4), y, color); 
 	    }
-		x += 1;
 	} 
 }
 
-void	draw3Dmap(t_mlx *data, float x, float y, float ra)
+void	draw3Dmap(t_mlx *data, float x, float y, float ra, int color)
 {
 	float dist = sqrt((x - px) * (x - px) + (y - py) * (y - py));
 	//float correctedDist = dist * -cos(ra - pa); // 'ra' is the ray's angle, 'pa' is the player's angle
 	int lineHeight = (int)(HEIGHT / dist);
 
 
-	drawVerticalSegment(data, x, abs(lineHeight * 32));
+	drawVerticalSegment(data, abs(lineHeight * 32), color);
 	//if (data->k->p)
 	//	printf ("ray:%i\theight:%i\tdist:%.1f\n", ray, lineHeight, dist);
 }
@@ -187,7 +185,7 @@ int drawLine(t_mlx *data, int x0, int y0, int x1, int y1, int color, float ra)
 
     while (1) {
 		pixPut(data, x0, y0, color);
-        if (map[(abs(y0 / MAPS))][abs(x0 / MAPS)] == '1' || x0 == x1 && y0 == y1){draw3Dmap(data, x0, y0, ra);break;}
+        if (map[(abs(y0 / MAPS))][abs(x0 / MAPS)] == '1' || x0 == x1 && y0 == y1){draw3Dmap(data, x0, y0, ra, color);break;}
         e2 = 2 * err;
         if (e2 >= dy) { err += dy; x0 += sx; }
         if (e2 <= dx) { err += dx; y0 += sy; }
@@ -266,8 +264,8 @@ void	display(t_mlx *d)
 	drawBackground(d);
 	drawMap(d);
 	drawPlayer(d, py, px);
-	drawLine(d,px ,py,pdx,pdy,BLUE, pa);
 	bresCast(d);
+	drawLine(d,px ,py,pdx,pdy,BLUE, pa);
 	swap_buffers(d);
 }
 
@@ -278,6 +276,7 @@ int	buttons(t_mlx *d)
 	if (d->k->a){pa-=RS; pa=FixAng(pa);pdx=px + LINE * cos(degToRad(pa)); pdy= py + LINE * sin(degToRad(pa));}
 	if (d->k->w){px+=cos(degToRad(pa)) * MS; py+=sin(degToRad(pa)) * MS;pdx+=cos(degToRad(pa)) * MS; pdy+=sin(degToRad(pa)) * MS;}
 	if (d->k->s){px-=cos(degToRad(pa)) * MS; py-=sin(degToRad(pa)) * MS;pdx-=cos(degToRad(pa)) * MS; pdy-=sin(degToRad(pa)) * MS;}
+	//printf("pa:%.1f\n", (pa+=RS, pa=FixAng(pa)));
 	display(d);
 }
 
