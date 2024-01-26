@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/17 16:17:57 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/20 23:11:05 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/26 17:13:01 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,11 @@ static void	_pNode(t_n node)
 	else if (node.c)
 		write (1, "C", 1);
 	else if (node.s)
-		write (1, " ", 1);
+		write (1, "0", 1);
 	else if (node.w)
 		write (1, "\033[107m \033[0m", 11);
 	else 
-		write (1, " ", 1);
+		write (1, "0", 1);
 }
 
 void	PrintNodes(t_mdata *f)

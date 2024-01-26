@@ -6,15 +6,11 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:49 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/26 16:56:06 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/26 17:08:09 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/cub3d.h"
-
-
-
-
 
 //main will have to be changed later on
 int	main(void)
@@ -64,7 +60,7 @@ int	main(void)
 		printf("\033[102mgood Map\033[0m\n");
 	else
 		printf("\033[101mbad Map\033[0m\n");
-	
+	print_map(fdata.map);
 	/*			cleaning up				*/
 	clean_all(buf, fdata, fd);
 	

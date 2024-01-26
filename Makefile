@@ -6,7 +6,7 @@
 #    By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/16 14:07:50 by djacobs           #+#    #+#              #
-#    Updated: 2024/01/26 16:54:30 by djacobs          ###   ########.fr        #
+#    Updated: 2024/01/26 16:58:56 by djacobs          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ CFLAGS		:= -g3 -Wall -Werror -Wextra
 
 INC_DIR		:= -Iinclude -I ./minilibx-linux
 MLX			:= -L./minilibx-linux
-MIN_LIBX	= ./minilibx-linux/ibmlx_Linux.a ./minilibx-linux/libmlx.a
+MIN_LIBX	= ./minilibx-linux/libmlx_Linux.a ./minilibx-linux/libmlx.a
 
 HEADER		:= include/cub3d.h
 
