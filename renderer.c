@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/28 11:39:06 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/28 21:59:01 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,16 @@ typedef struct s_key{
 	bool	p;
 }t_key;
 
+typedef struct s_3Dimg{
+	void	*img[2];
+	char	*add[2];
+	int		bpp;
+	int		len;
+	int		end;
+	int		current;
+}t_3Dimg;
+
+
 typedef struct s_mlx{
 	void	*mlx;
 	void	*win;
@@ -80,6 +90,8 @@ float	px, py, pa;//point position/angle
 
 float	pdx, pdy;//delta point
 
+float	rdx, rdy;
+
 float	ry, rx;
 
 int	ray = 0;
@@ -87,6 +99,8 @@ int	ray = 0;
 int	lastMouseX, lastMouseY;//mouse coordinates
 
 int	mapX = 8, mapY = 8;
+
+int short pass = 0;
 
 float FixAng(float a){if(a>359){ a-=360;}if(a<0){ a+=360;}return a;}//keeps the angle withing 360
 float degToRad(int a) { return a*PI/180.0;}//converts an angle to a radian for cos and sin functions
@@ -109,8 +123,9 @@ void swap_buffers(t_mlx *data) {
 		mlx_put_image_to_window(data->mlx, data->win, data->i->img[data->i->current], 0, 0);
     data->i->current = !data->i->current; // Swap buffer index
     mlx_destroy_image(data->mlx, data->i->img[data->i->current]); // Destroy the old buffer
-    data->i->img[data->i->current] = mlx_new_image(data->mlx, WIDTH, HEIGHT); // Create a new buffer
+    data->i->img[data->i->current] = mlx_new_image(data->mlx, WIDTH / 2, HEIGHT); // Create a new buffer
     data->i->add[data->i->current] = mlx_get_data_addr(data->i->img[data->i->current], &data->i->bpp, &data->i->len, &data->i->end);
+	//usleep(1);
 	if (data->win != NULL)
 		mlx_put_image_to_window(data->mlx, data->win, data->i3D->img[data->i3D->current], HEIGHT, 0);
     data->i3D->current = !data->i3D->current; // Swap buffer index
@@ -143,6 +158,8 @@ void pixPut(t_mlx *d, int x, int y, int color)
 
 void pixPut3D(t_mlx *d, int x, int y, int color)
 {
+	//if (!ray)
+	//	printf("(int)x:%i\n", x);
 	if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
 		int pixelPos = y * d->i3D->len + x * (d->i3D->bpp / 8);
 		char *dst = d->i3D->add[d->i3D->current] + pixelPos;
@@ -150,30 +167,57 @@ void pixPut3D(t_mlx *d, int x, int y, int color)
 	}
 }
 
-void drawVerticalSegment(t_mlx *data, float lineHeight, int color) {
+#define SPOS 8.5//strip position
+#define SWID 7.6//strip thickness
+
+void drawVerticalSegment(t_mlx *data, float lineHeight, float oldHeight, int color) {
     float drawStart = -lineHeight / 2 + HEIGHT / 2;
     if (drawStart < 0) drawStart = 0;
     float drawEnd = lineHeight / 2 + HEIGHT / 2;
     if (drawEnd >= HEIGHT) drawEnd = HEIGHT - 1;
-	if (data->k->p)
-		printf("ray%i\theight:%.1f\tdrawdelta%.1f\n", ray, lineHeight, drawStart - drawEnd);
 
-	for (float i = 0.0; i < 7.5; i+=0.2){
-		for (float y = drawStart; y < drawEnd; y++) {
-	        pixPut3D(data, ((ray * 8) + (WIDTH / 64)) + i, y, color);
+	for (float i = 0.0; i < SWID; i+=0.1){
+		for (float y = drawStart; y < (drawEnd); y++) {
+	        pixPut3D(data, ((ray * SPOS) + (WIDTH / 64) - 14.5) + i, y, color);
 	    }
 	}
 }
+        //pixPut3D(data, ((ray * 8.5) + (WIDTH / 64) - 14.0) + i, y, color);
+//for (float y = drawStart; y < (drawEnd - ((abs(rdx - rdy) + (add+=0.2)) / 2)); y++) {
 
-void	draw3Dmap(t_mlx *data, float x, float y, float ra, int color)
+//data | line position x and y | radian | delta old x and y | color
+void	draw3Dmap(t_mlx *data, float x, float y, float ra, float odX, float odY, int color)
 {
 	float dist = sqrt((x - px) * (x - px) + (y - py) * (y - py));
 	float correctedDist = dist * cos(degToRad(ra - pa)); // 'ra' is the ray's angle, 'pa' is the player's angle
 	float lineHeight = HEIGHT / correctedDist;
+	//float odist = sqrt(());
+	//float codist = odist * cos(degToRad(ra - pa));
+	//float nlH = HEIGHT / codist;
 
-	drawVerticalSegment(data, lineHeight * 64, color);
-	//if (data->k->p)
-	//	printf ("ray:%i\theight:%i\tdist:%.1f\n", ray, lineHeight, dist);
+
+	drawVerticalSegment(data, lineHeight * 64, , color);
+}
+
+void drawLineDDA(t_mlx *data, int x1, int y1, int x2, int y2, int color, float ra) {
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+
+    int steps = fmax(abs(dx), abs(dy));
+
+    float xIncrement = dx / (float)steps;
+    float yIncrement = dy / (float)steps;
+
+    float x = x1;
+    float y = y1;
+
+    for (int i = 0; i <= steps; i++) {
+        pixPut(data, round(x), round(y), color);
+		if (map[abs(y / MAPS)][abs(x / MAPS)] == '1') {draw3Dmap(data, x, y, ra, DGREEN);break;}
+		if (x1 == x2 && y1 == y2) break;
+        x += xIncrement;
+        y += yIncrement;
+    }
 }
 
 //bresenham draw
@@ -185,27 +229,35 @@ int drawLine(t_mlx *data, int x0, int y0, int x1, int y1, int color, float ra)
 
     while (1) {
 		pixPut(data, x0, y0, color);
-        if (map[(abs(y0 / MAPS))][abs(x0 / MAPS)] == '1' || x0 == x1 && y0 == y1)
-		{draw3Dmap(data, x0, y0, ra, DGREEN);break;}
+		if (map[(abs(y0 / MAPS))][abs(x0 / MAPS)] == '1') {draw3Dmap(data, x0, y0, ra, color);break;}
+        if (x0 == x1 && y0 == y1) break;
         e2 = 2 * err;
         if (e2 >= dy) { err += dy; x0 += sx; }
         if (e2 <= dx) { err += dx; y0 += sy; }
     }
 }
+
 #define FOV 60
 #define NUM_RAYS 60
 
 void bresCast(t_mlx *data) {
     float angleStep = FOV / NUM_RAYS; // Define FOV and NUM_RAYS as needed
     float rayAngle = pa - (FOV / 2);
+	float odX;
+	float odY;
 
-    for (int i = 0; i < NUM_RAYS; i++) {
+    for (float i = 0; i < NUM_RAYS; i++) {
+		if (i) {rdx = odX - (px + LINE * cos(degToRad(rayAngle)));
+				rdy = odY - (py + LINE * sin(degToRad(rayAngle)));}
+		else {	rdx = px + LINE * cos(degToRad(rayAngle));
+				rdy = py + LINE * sin(degToRad(rayAngle));}
         // Calculate ray direction
-        float odX = px + LINE * cos(degToRad(rayAngle));
-        float odY = py + LINE * sin(degToRad(rayAngle));
+        odX = px + LINE * cos(degToRad(rayAngle));
+        odY = py + LINE * sin(degToRad(rayAngle));
 
         // Cast the ray and draw the 3D view
         drawLine(data, px, py, odX, odY, GREEN, rayAngle);
+		//drawLineDDA(data, px, py, odX, odY, GREEN, rayAngle);
         rayAngle += angleStep;
 		ray++;
     }
@@ -258,16 +310,27 @@ void drawPlayer(t_mlx *d, int y, int x)
 	}
 }
 
+void	drawTopBot(t_mlx *d)
+{
+	for (int y = 0;y < HEIGHT / 2; y++){
+		for (int x = 0; x < WIDTH / 2; x++)
+			pixPut3D(d, x, y, 0x00D5E3D5);
+	}
+}
+
 void	display(t_mlx *d)
 {
-	//if (d->win != NULL) mlx_put_image_to_window(d->mlx, d->win, d->i->img[d->i->current], 0, 0);
-	//printf("px:%.1f||py:%.1f||pa:%.1f\tpdx:%.1f||pdy:%.1f\n", px, py, pa, pdx, pdy);
+	//if (pass < 2 || d->k->d || d->k->a || d->k->w || d->k->s)
+	//{
+	swap_buffers(d);
 	drawBackground(d);
 	drawMap(d);
 	drawPlayer(d, py, px);
+	drawTopBot(d);
 	bresCast(d);
 	//drawLine(d,px ,py,pdx,pdy,BLUE, pa);
-	swap_buffers(d);
+	//pass++;
+	//}
 }
 
 
@@ -288,10 +351,10 @@ int key_press(int key, void *param) {
     	close_win(key, param);
 		return (0);
 	}
-	if (key == 'w') d->k->w = true;
-    if (key == 'a') d->k->a = true;
-    if (key == 's') d->k->s = true;
-    if (key == 'd') d->k->d = true;
+	if (key == 'w') {d->k->w = true;}
+    if (key == 'a') {d->k->a = true;}
+    if (key == 's') {d->k->s = true;}
+    if (key == 'd') {d->k->d = true;}
 	if (key == 'p') d->k->p = true;
 	return (0);
 }
@@ -300,12 +363,12 @@ int key_press(int key, void *param) {
 int key_release(int key, void *param) {
     t_mlx	*d = (t_mlx *)param;
 	
-	if (key == 'w') d->k->w = false;
-    if (key == 'a') d->k->a = false;
-    if (key == 's') d->k->s = false;
-    if (key == 'd') d->k->d = false;
+	if (key == 'w') {d->k->w = false;}
+    if (key == 'a') {d->k->a = false;}
+    if (key == 's') {d->k->s = false;}
+    if (key == 'd') {d->k->d = false;}
 	if (key == 'p') d->k->p = false;
-    return (0);
+   return (0);
 }
 
 void	destroyAll(t_mlx *d){
