@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/26 16:41:51 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/28 11:39:06 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 #define YELLOW 0x00FFFF00
 #define WHITE 0x00FFFFFF
 #define GREEN 0x0000FF00
+#define DGREEN 0x0000B500
 #define BLUE 0x000000FF
 
 typedef struct s_p{
@@ -63,7 +64,7 @@ typedef struct s_mlx{
 
 #define PI 3.14159
 #define MAPS 64
-#define RS (float)0.5
+#define RS (float)0.8
 #define MS 1
 //this map is already created in the main program btw
 char map[][8] =	{{"11111111"},\
@@ -109,22 +110,22 @@ void swap_buffers(t_mlx *data) {
     data->i->current = !data->i->current; // Swap buffer index
     mlx_destroy_image(data->mlx, data->i->img[data->i->current]); // Destroy the old buffer
     data->i->img[data->i->current] = mlx_new_image(data->mlx, WIDTH, HEIGHT); // Create a new buffer
-	if (data->win != NULL)
-		mlx_put_image_to_window(data->mlx, data->win, data->i3D->img[data->i3D->current], 512, 0);
     data->i->add[data->i->current] = mlx_get_data_addr(data->i->img[data->i->current], &data->i->bpp, &data->i->len, &data->i->end);
+	if (data->win != NULL)
+		mlx_put_image_to_window(data->mlx, data->win, data->i3D->img[data->i3D->current], HEIGHT, 0);
     data->i3D->current = !data->i3D->current; // Swap buffer index
     mlx_destroy_image(data->mlx, data->i3D->img[data->i3D->current]); // Destroy the old buffer
-    data->i3D->img[data->i3D->current] = mlx_new_image(data->mlx, WIDTH, HEIGHT); // Create a new buffer
+    data->i3D->img[data->i3D->current] = mlx_new_image(data->mlx, WIDTH / 2, HEIGHT); // Create a new buffer
     data->i3D->add[data->i3D->current] = mlx_get_data_addr(data->i3D->img[data->i3D->current], &data->i3D->bpp, &data->i3D->len, &data->i3D->end);
 }
 
 void init_images(t_mlx *data) {
     for (int i = 0; i < 2; i++) {
-        data->i->img[i] = mlx_new_image(data->mlx, WIDTH, HEIGHT);
+        data->i->img[i] = mlx_new_image(data->mlx, WIDTH / 2, HEIGHT);
         data->i->add[i] = mlx_get_data_addr(data->i->img[i], &data->i->bpp, &data->i->len, &data->i->end);
     }
-	for (int i =0; i < 2; i++){
-		data->i3D->img[i] = mlx_new_image(data->mlx, WIDTH / 2, HEIGHT / 2);
+	for (int i = 0; i < 2; i++){
+		data->i3D->img[i] = mlx_new_image(data->mlx, WIDTH / 2, HEIGHT);
 		data->i3D->add[i] = mlx_get_data_addr(data->i3D->img[i], &data->i3D->bpp, &data->i3D->len, &data->i3D->end);		
 	}
     data->i->current = 0;
@@ -149,29 +150,28 @@ void pixPut3D(t_mlx *d, int x, int y, int color)
 	}
 }
 
-void drawVerticalSegment(t_mlx *data, int lineHeight, int color) {
-    int drawStart = -lineHeight / 2 + HEIGHT / 2;
+void drawVerticalSegment(t_mlx *data, float lineHeight, int color) {
+    float drawStart = -lineHeight / 2 + HEIGHT / 2;
     if (drawStart < 0) drawStart = 0;
-    int drawEnd = lineHeight / 2 + HEIGHT / 2;
+    float drawEnd = lineHeight / 2 + HEIGHT / 2;
     if (drawEnd >= HEIGHT) drawEnd = HEIGHT - 1;
 	if (data->k->p)
-		printf("ray%i\theight:%i\tdrawdelta%i\n", ray, lineHeight, abs(drawStart - drawEnd));
+		printf("ray%i\theight:%.1f\tdrawdelta%.1f\n", ray, lineHeight, drawStart - drawEnd);
 
-    for (int i = 0; i < 8; i++){
-		for (int y = drawStart; y < drawEnd; y++) {
-	        pixPut3D(data, (ray + (i)) + (WIDTH / 4), y, color); 
+	for (float i = 0.0; i < 7.5; i+=0.2){
+		for (float y = drawStart; y < drawEnd; y++) {
+	        pixPut3D(data, ((ray * 8) + (WIDTH / 64)) + i, y, color);
 	    }
-	} 
+	}
 }
 
 void	draw3Dmap(t_mlx *data, float x, float y, float ra, int color)
 {
 	float dist = sqrt((x - px) * (x - px) + (y - py) * (y - py));
-	//float correctedDist = dist * -cos(ra - pa); // 'ra' is the ray's angle, 'pa' is the player's angle
-	int lineHeight = (int)(HEIGHT / dist);
+	float correctedDist = dist * cos(degToRad(ra - pa)); // 'ra' is the ray's angle, 'pa' is the player's angle
+	float lineHeight = HEIGHT / correctedDist;
 
-
-	drawVerticalSegment(data, abs(lineHeight * 32), color);
+	drawVerticalSegment(data, lineHeight * 64, color);
 	//if (data->k->p)
 	//	printf ("ray:%i\theight:%i\tdist:%.1f\n", ray, lineHeight, dist);
 }
@@ -185,7 +185,8 @@ int drawLine(t_mlx *data, int x0, int y0, int x1, int y1, int color, float ra)
 
     while (1) {
 		pixPut(data, x0, y0, color);
-        if (map[(abs(y0 / MAPS))][abs(x0 / MAPS)] == '1' || x0 == x1 && y0 == y1){draw3Dmap(data, x0, y0, ra, color);break;}
+        if (map[(abs(y0 / MAPS))][abs(x0 / MAPS)] == '1' || x0 == x1 && y0 == y1)
+		{draw3Dmap(data, x0, y0, ra, DGREEN);break;}
         e2 = 2 * err;
         if (e2 >= dy) { err += dy; x0 += sx; }
         if (e2 <= dx) { err += dx; y0 += sy; }
@@ -216,7 +217,7 @@ void	drawBackground(t_mlx *d)
 	int	pixel;
 
 	for (int i = 0; i < HEIGHT; i++) 
-		for (int j = 0; j < WIDTH; j++) 
+		for (int j = 0; j < WIDTH / 2; j++) 
 			pixPut(d, j, i, 0x00808080);
 }
 
@@ -265,7 +266,7 @@ void	display(t_mlx *d)
 	drawMap(d);
 	drawPlayer(d, py, px);
 	bresCast(d);
-	drawLine(d,px ,py,pdx,pdy,BLUE, pa);
+	//drawLine(d,px ,py,pdx,pdy,BLUE, pa);
 	swap_buffers(d);
 }
 

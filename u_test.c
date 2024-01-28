@@ -18,7 +18,7 @@ void	print_map(char **split)
 		for(; split[y][i]; i++)
 			split[y][i] == '\t' ? write (1, "    ", 4) : write (1, &split[y][i], 1);
 		i = 0;
-		if (split[y][i] != '\n')
+		if (split[y][i] != '\n')cd ..
 			write (1, "\n", 1);
 	}	
 }
