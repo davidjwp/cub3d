@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/19 18:07:46 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/20 22:50:18 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/29 17:10:49 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ static bool	texcol(int *pos, t_mdata *fd, int y, char **tex)
 	return (false);
 }
 
+//checks for the textures and colors and store them in the structure
 bool	texcol_check(t_mdata *fd, int i, int y)
 {
 	char	*tex[5];
@@ -76,7 +77,11 @@ bool	texcol_check(t_mdata *fd, int i, int y)
 	return (false);
 }
 
-//start searching the map from the position of the last color of texture
+/*
+	create the map in fdata
+
+	starts searching the map from the position of the last color of texture
+*/
 bool	cr_map(t_mdata *fdata)
 {
 	char	**tmp;

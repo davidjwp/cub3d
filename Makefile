@@ -6,13 +6,13 @@
 #    By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/16 14:07:50 by djacobs           #+#    #+#              #
-#    Updated: 2024/01/26 16:58:56 by djacobs          ###   ########.fr        #
+#    Updated: 2024/01/29 17:13:05 by djacobs          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 #add rule for compiling on dells vs macs that change the speed of the character
 #and the speed of looking left and right
-NAME		:= test
+NAME		:= cub3D
 CC			:= gcc
 CFLAGS		:= -g3 -Wall -Werror -Wextra
 
@@ -28,12 +28,13 @@ LIBFT		:= $(LIBFT_DIR)/libft.a
 
 SRCS		:=	srcs/main.c \
 				srcs/Parsing/parser.c \
-				srcs/Parsing/utilsA.c \
-				srcs/Parsing/utilsB.c \
-				srcs/Parsing/utilsC.c \
-				u_test.c \
+				srcs/Parsing/Parser_utilsA.c \
+				srcs/Parsing/Parser_utilsB.c \
+				srcs/Parsing/Parser_utilsC.c \
 				srcs/Parsing/cr_map.c \
 				srcs/Parsing/cr_nodes.c \
+				srcs/Prints.c \
+				renderer.c
 
 OBJ_DIR		:= obj/
 OBJS		:= $(SRCS:%.c=$(OBJ_DIR)%.o)

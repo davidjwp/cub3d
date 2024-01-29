@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 20:25:03 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/20 22:50:33 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/29 16:44:29 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ static void	setn_line(t_n **nl, char *line, t_pos p, int len)
 	{
 		while (++i < l && line[i] == '\t')
 		{
-			tmp =  4 + p.x--;
+			tmp = 4 + p.x--;
 			while (&(nl[0][++p.x]) != &(nl[0][tmp]))
 				set_node(&(nl[0][p.x]), (t_n){p, false, true, false, false});
 		}

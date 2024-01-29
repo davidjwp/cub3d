@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 13:58:28 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/26 16:54:55 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/29 19:52:22 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # include <mlx.h>
 
 # define BUF_SIZ 8192
-# define WIDTH 512
+# define WIDTH 1024
 # define HEIGHT 512
 # define BLOCK 32;
 # define PI 3.14159
@@ -49,15 +49,17 @@ typedef struct s_nodes{
 typedef struct s_mdata{
 	char	**map;
 	char	**tex;
+	t_pos	iwh[6];
 	t_n		**m_nodes;
 	int		tc_index[6];
+	t_pos	cpos;
 	t_pos	mlw;
-	void	**texcol;
+	void	*xpms[4];
+	int		col[2];
 }t_mdata;
 
 typedef struct s_cub3D{
 	t_mdata	fdata;
-	//mlx_t	*mlx;
 }t_cub;
 
 typedef struct s_lst{
@@ -88,7 +90,7 @@ void	clean_all(char *buf, t_mdata mdata, int fd);
 
 /*		UtilsB			*/
 int		gnl(int fd, char **str, int i, int n);
-bool	is_texcol(int pos, t_mdata *fdata);
+//bool	is_texcol(int pos, t_mdata *fdata);
 int		find_map(t_mdata *fdata, t_pos *p);
 bool	is_full(char **map);
 
@@ -105,10 +107,11 @@ bool	texcol_check(t_mdata *fd, int i, int y);
 bool	cr_nodes(t_mdata *fdata);
 void	free_nodes(t_n **nodes, t_pos mlw, int index);
 
-/*		u_test			*/
+/*		Prints			*/
 void	print_map(char **map);
-void	PrintNodes(t_mdata *f);
 void	tty_print(t_mdata *f, t_lst *l, t_n *c, int i);
 
+/*		renderer			*/
+int		start_renderer(t_mdata *fdata);
 
 #endif

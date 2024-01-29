@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utilsB.c                                           :+:      :+:    :+:   */
+/*   Parser_utilsB.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 14:03:39 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/23 15:39:26 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/29 17:03:44 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,21 +41,21 @@ int	gnl(int fd, char **str, int i, int n)
 	return (*str = buf, 0);
 }
 
-bool	is_texcol(int pos, t_mdata *fdata)
-{
-	int	i;
+//maybe remove that idk
+//bool	is_texcol(int pos, t_mdata *fdata)
+//{
+//	int	i;
 
-	i = -1;
-	while (++i < 6)
-		if (pos == fdata->tc_index[i])
-			return (true);
-	return (false);
-}
-
+//	i = -1;
+//	while (++i < 6)
+//		if (pos == fdata->tc_index[i])
+//			return (true);
+//	return (false);
+//}
 /*
 *	finds the character from the position of the last texture or color
 */
-bool	find_char(t_mdata *fdata, t_pos *p, int hp)
+static bool	find_char(t_mdata *fdata, t_pos *p, int hp)
 {
 	while ((&fdata->map[hp])[++p->y] != NULL)
 	{

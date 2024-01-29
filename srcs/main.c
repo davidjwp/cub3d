@@ -6,11 +6,24 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:49 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/26 17:08:09 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/29 19:54:26 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/cub3d.h"
+
+//typedef struct s_mdata{
+	//char	**map;
+	//char	**tex;
+	//t_pos	iwh[6];
+	//t_n		**m_nodes;
+	//int		tc_index[6];
+	//t_pos	cpos;
+	//t_pos	mlw;
+	//void	*xpms[4];
+	//int		col[2];
+//}t_mdata;
+//
 
 //main will have to be changed later on
 int	main(void)
@@ -29,9 +42,18 @@ int	main(void)
 	//mlx = mlx_init(WIDTH, HEIGHT, "window", true);
 	//if (!mlx)
 	//	return (err_msg("mlx init fail"), -1);
-
 	//main data structure
-	fdata = (t_mdata){NULL, NULL, NULL, {0, 0, 0, 0, 0, 0}, {0, 0}, NULL};
+	fdata = (t_mdata){\
+	NULL, \
+	NULL, \
+	{{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}}, \
+	NULL, \
+	{0, 0, 0, 0, 0, 0}, \
+	{-1, -1}, \
+	{0, 0}, \
+	{NULL, NULL, NULL, NULL},\
+	{0, 0}
+	};
 	fdata.tex = malloc(sizeof(char *) * 7);
 	if (!fdata.tex)
 		return (err_msg("malloc fail"), -1);
@@ -57,14 +79,17 @@ int	main(void)
 	
 	/*			parsing					*/
 	if (file_parse(ft_split(buf, '\n'), file_name, &fdata))
-		printf("\033[102mgood Map\033[0m\n");
+		printf("\033[102mgood Map\033[0m\n\n");
 	else
-		printf("\033[101mbad Map\033[0m\n");
-	print_map(fdata.map);
-	/*			cleaning up				*/
-	clean_all(buf, fdata, fd);
+		printf("\033[101mbad Map\033[0m\n\n");
 	
 	/*			mlx loop				*/
+	start_renderer(&fdata);
+	/*			cleaning up				*/
+	clean_all(buf, fdata, fd);
+
+
+	
 	//mlx_loop(mlx);
 	//mlx_terminate(mlx);
 	return (1);
