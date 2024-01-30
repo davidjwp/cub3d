@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 13:58:28 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/29 19:52:22 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/30 19:56:11 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ typedef struct s_nodes{
 
 typedef struct s_mdata{
 	char	**map;
-	char	**tex;
+	char	*tex[7];
 	t_pos	iwh[6];
 	t_n		**m_nodes;
 	int		tc_index[6];
@@ -63,7 +63,7 @@ typedef struct s_cub3D{
 }t_cub;
 
 typedef struct s_lst{
-	t_n			*node;
+	t_n				*node;
 	struct s_lst	*next;
 }t_lst;
 
@@ -77,7 +77,6 @@ enum	e_tex{
 };
 
 /*					Parser					*/
-
 /*		parser			*/
 bool	file_parse(char **split, const char *file_name, t_mdata *fdata);
 
@@ -90,14 +89,17 @@ void	clean_all(char *buf, t_mdata mdata, int fd);
 
 /*		UtilsB			*/
 int		gnl(int fd, char **str, int i, int n);
-//bool	is_texcol(int pos, t_mdata *fdata);
 int		find_map(t_mdata *fdata, t_pos *p);
 bool	is_full(char **map);
+int		find_highest(int *index);
 
 /*		UtilsC			*/
-int		find_highest(int *index);
+
 bool	l_issp(char	*map);
 bool	free_lst(t_lst *l);
+bool	find_nchar(t_n **start, t_mdata *f, t_pos *p);
+bool	n_open(t_n **node, t_pos p, t_pos mlw);
+
 
 /*		cr_map			*/
 bool	cr_map(t_mdata *fdata);

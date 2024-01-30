@@ -1,12 +1,11 @@
-EA ./path_to_the_east_texture								     
-NO ./path_to_the_north_texture          			
-bug here if no values are given
-F   					
+NO srcs/xpms/North.xpm
+SO srcs/xpms/South.xpm
+WE srcs/xpms/West.xpm
+EA srcs/xpms/East.xpm							     
+F 0,   000023 3,24,,,,,	,
 C 225,30,0				  	 	
-WE ./path_to_the_west_texture
 
 
-SO ./path_to_the_south_texture   
 
 11111111
 10100011

@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 14:03:39 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/29 17:03:44 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/30 15:49:48 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,17 +41,6 @@ int	gnl(int fd, char **str, int i, int n)
 	return (*str = buf, 0);
 }
 
-//maybe remove that idk
-//bool	is_texcol(int pos, t_mdata *fdata)
-//{
-//	int	i;
-
-//	i = -1;
-//	while (++i < 6)
-//		if (pos == fdata->tc_index[i])
-//			return (true);
-//	return (false);
-//}
 /*
 *	finds the character from the position of the last texture or color
 */
@@ -95,4 +84,20 @@ bool	is_full(char **map)
 		if (++i == 6)
 			return (true);
 	return (false);
+}
+
+int	find_highest(int *index)
+{
+	int	highest;
+	int	y;
+	int	i;
+
+	y = -1;
+	i = -1;
+	highest = 0;
+	while (++y < 2)
+		while (++i < 6)
+			if (index[i] > highest)
+				highest = index[i];
+	return (highest);
 }

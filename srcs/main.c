@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:49 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/29 19:54:26 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/30 20:14:35 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	main(void)
 	//main data structure
 	fdata = (t_mdata){\
 	NULL, \
-	NULL, \
+	{NULL, NULL, NULL, NULL, NULL, NULL, NULL}, \
 	{{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}}, \
 	NULL, \
 	{0, 0, 0, 0, 0, 0}, \
@@ -54,16 +54,16 @@ int	main(void)
 	{NULL, NULL, NULL, NULL},\
 	{0, 0}
 	};
-	fdata.tex = malloc(sizeof(char *) * 7);
 	if (!fdata.tex)
 		return (err_msg("malloc fail"), -1);
-	for (int i = 0; i < 6; i++){
-		fdata.tex[i] = malloc(sizeof(char) * BUF_SIZ);
-		if (!fdata.tex[i])
-			return (err_msg("malloc fail"), free_split(fdata.tex, i), -1);
-		*fdata.tex[i] = 0;
-	}
-	fdata.tex[6] = NULL;
+	
+	//for (int i = 0; i < 6; i++){
+	//	fdata.tex[i] = malloc(sizeof(char) * BUF_SIZ);
+	//	if (!fdata.tex[i])
+	//		return (err_msg("malloc fail"), free_split(fdata.tex, i), -1);
+	//	*fdata.tex[i] = 0;
+	//}
+	//fdata.tex[6] = NULL;
 	
 	//opening files
 	file_name = "Map.cub";
@@ -81,14 +81,12 @@ int	main(void)
 	if (file_parse(ft_split(buf, '\n'), file_name, &fdata))
 		printf("\033[102mgood Map\033[0m\n\n");
 	else
-		printf("\033[101mbad Map\033[0m\n\n");
+		return (printf("\033[101mbad Map\033[0m\n\n"), clean_all(buf, fdata,fd), -1);
 	
 	/*			mlx loop				*/
 	start_renderer(&fdata);
 	/*			cleaning up				*/
 	clean_all(buf, fdata, fd);
-
-
 	
 	//mlx_loop(mlx);
 	//mlx_terminate(mlx);

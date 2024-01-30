@@ -6,27 +6,11 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/17 17:39:02 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/29 16:46:26 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/30 15:49:39 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/cub3d.h"
-
-int	find_highest(int *index)
-{
-	int	highest;
-	int	y;
-	int	i;
-
-	y = -1;
-	i = -1;
-	highest = 0;
-	while (++y < 2)
-		while (++i < 6)
-			if (index[i] > highest)
-				highest = index[i];
-	return (highest);
-}
 
 bool	l_issp(char	*map)
 {
@@ -53,5 +37,41 @@ bool	free_lst(t_lst *l)
 		free(f);
 	}
 	free(l);
+	return (false);
+}
+
+bool	find_nchar(t_n **start, t_mdata *f, t_pos *p)
+{
+	int		n;
+
+	n = 0;
+	while (++p->y < f->mlw.y)
+	{
+		while (++p->x < f->mlw.x)
+		{
+			if (f->m_nodes[p->y][p->x].c)
+			{
+				*start = &f->m_nodes[p->y][p->x];
+				n++;
+			}
+		}
+		p->x = -1;
+	}
+	if (n > 1)
+		return (err_msg("too many characters"));
+	(*start)->visited = true;
+	*p = (*start)->p;
+	return (true);
+}
+
+bool	n_open(t_n **node, t_pos p, t_pos mlw)
+{
+	if (p.y + 1 >= mlw.y || p.y - 1 < 0 || p.x + 1 >= mlw.x || p.x - 1 < 0)
+		return (true);
+	if (node[p.y + 1][p.x].s || \
+	node[p.y - 1][p.x].s || \
+	node[p.y][p.x + 1].s || \
+	node[p.y][p.x - 1].s)
+		return (true);
 	return (false);
 }

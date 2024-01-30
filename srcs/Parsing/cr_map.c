@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/19 18:07:46 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/29 17:10:49 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/30 21:00:11 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ static bool	trim(t_mdata *md)
 	return (true);
 }
 
+//compares the line with the texture id
 static bool	texcol(int *pos, t_mdata *fd, int y, char **tex)
 {
 	*pos = 0;
@@ -52,30 +53,85 @@ static bool	texcol(int *pos, t_mdata *fd, int y, char **tex)
 	return (false);
 }
 
-//checks for the textures and colors and store them in the structure
+const char	*begtex(const char *s)
+{
+	int	i;
+
+	i = -1;
+	while (s[++i])
+		if (s[i] != 9 && s[i] != 32)
+			return (&s[i]);
+	return (s);
+}
+
+bool	order(char **tex)
+{
+	int		i;
+	bool	s;
+
+	i = 7;
+	s = false;
+	while (--i)
+	{
+		if (tex[i] != NULL)
+			s = true;
+		if (tex[i] == NULL && s)
+			return (err_msg("Bad texture order"));
+	}
+	return (true);
+}
+//the textures and colors and store them in the structure
 bool	texcol_check(t_mdata *fd, int i, int y)
 {
 	char	*tex[5];
 	int		pos;
 
 	while (++i < 7)
-		tex[i] = (char *[7]){"NO ./", "SO ./", "WE ./", "EA ./", "F ", \
+		tex[i] = (char *[7]){"NO", "SO", "WE", "EA", "F ", \
 		"C ", NULL}[i];
 	y = 0;
 	while (fd->map[y])
 	{
+		if (!order(fd->tex))
+			break ;
 		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos <= 3)
-			ft_strlcpy(fd->tex[pos], ft_strchr(fd->map[y], '/') + 1, \
-			ft_strlen(ft_strchr(fd->map[y], '/') + 1) + 1);
+			fd->tex[pos] = ft_strdup(begtex(&fd->map[y][0] + 2));
 		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos > 3)
-			ft_strlcpy(fd->tex[pos], ft_strchr(fd->map[y], ' ') + 1, \
-			ft_strlen(ft_strchr(fd->map[y], ' ') + 1) + 1);
+			fd->tex[pos] = ft_strdup(begtex(&fd->map[y][0] + 1));
 		y++;
 	}
 	if (is_full(fd->tex))
 		return (trim(fd));
 	return (false);
 }
+////checks for the textures and colors and store them in the structure
+/*
+bool	texcol_check(t_mdata *fd, int i, int y)
+{
+	char	*tex[5];
+	int		pos;
+
+	while (++i < 7)
+		tex[i] = (char *[7]){"NO", "SO", "WE", "EA", "F ", \
+		"C ", NULL}[i];
+	y = 0;
+	while (fd->map[y])
+	{
+		if (!order(fd->tex))
+			break ;
+		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos <= 3)
+			ft_strlcpy(fd->tex[pos], begtex(&fd->map[y][0] + 2), \
+			ft_strlen(begtex(&fd->map[y][0] + 2) + 1));
+		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos > 3)
+			ft_strlcpy(fd->tex[pos], begtex(&fd->map[y][0] + 1), \
+			ft_strlen(begtex(&fd->map[y][0] + 1)) + 1);
+		y++;
+	}
+	if (is_full(fd->tex))
+		return (trim(fd));
+	return (false);
+}
+*/
 
 /*
 	create the map in fdata

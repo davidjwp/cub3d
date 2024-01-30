@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 14:26:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/29 16:46:01 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/30 20:32:25 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,9 +60,13 @@ bool	err_msg(const char *msg)
 
 void	clean_all(char *buf, t_mdata mdata, int fd)
 {
+	int	i;
+
+	i = -1;
 	free(buf);
 	free_split(mdata.map, 0);
-	free_split(mdata.tex, 0);
+	while (++i < 7)
+		free(mdata.tex[i]);
 	if (mdata.m_nodes != NULL)
 		free_nodes(mdata.m_nodes, mdata.mlw, 0);
 	close(fd);

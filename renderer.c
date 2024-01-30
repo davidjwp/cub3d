@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:29 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/29 22:20:31 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/01/30 21:08:45 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,10 @@
 #define GREEN 0x0000FF00
 #define DGREEN 0x0000B500
 #define BLUE 0x000000FF
+#define XWALL 0x00EAE9D9
+#define YWALL 0x00D5D3BD
+#define SKY	0x0032BEC7
+#define GROUND 0x0027C650
 
 typedef struct s_p{
 	float	x;
@@ -223,7 +227,7 @@ int drawLine(t_mlx *data, int x0, int y0, int x1, int y1, int color, float ra)
 		if (data->map[(abs(y0 / MAPS))][abs(x0 / MAPS)] == '1') {draw3Dmap(data, x0, y0, ra, dx, dy, color);break;}
 		if (x0 == x1 && y0 == y1) break;
 		e2 = 2 * err;
-		if (e2 >= dy) { err += dy; x0 += sx; if (data->map[(abs(y0 / MAPS))][abs(x0 / MAPS)] == '1') color = DGREEN	;}
+		if (e2 >= dy) { err += dy; x0 += sx; if (data->map[(abs(y0 / MAPS))][abs(x0 / MAPS)] == '1') color = YWALL	;}
 		if (e2 <= dx) { err += dx; y0 += sy; }
 	}
 	return (0);
@@ -248,7 +252,7 @@ void bresCast(t_mlx *data) {
 		odY = py + LINE * sin(degToRad(rayAngle));
 
 		// Cast the ray and draw the 3D view
-		drawLine(data, px, py, odX, odY, GREEN, rayAngle);
+		drawLine(data, px, py, odX, odY, XWALL, rayAngle);
 		//drawLineDDA(data, px, py, odX, odY, GREEN, rayAngle);
 		rayAngle += angleStep;
 		ray++;
@@ -302,7 +306,11 @@ void	drawTopBot(t_mlx *d)
 {
 	for (int y = 0;y < HEIGHT / 2; y++){
 		for (int x = 0; x < WIDTH / 2; x++)
-			pixPut3D(d, x, y, 0x00D5E3D5);
+			pixPut3D(d, x, y, SKY);
+	}
+	for (int y = 0;y < HEIGHT / 2; y++){
+		for (int x = 0; x < WIDTH / 2; x++)
+			pixPut3D(d, x, y + (HEIGHT / 2), DGREEN);
 	}
 }
 
@@ -359,11 +367,13 @@ int key_release(int key, void *param) {
 	return (0);
 }
 
-void	destroyAll(t_mlx *d){
+void	destroyAll(t_mlx *d, t_mdata *fdata){
 	for (int i = 0; i < 2; i++)
 		mlx_destroy_image(d->mlx, d->i->img[i]);
 	for (int i = 0;i < 2; i++)
 		mlx_destroy_image(d->mlx, d->i3D->img[i]);
+	for (int i = 0; i < 4; i++)
+		mlx_destroy_image(d->mlx, fdata->xpms[i]);
 	mlx_destroy_display(d->mlx);
 	free(d->mlx);
 	free(d->k);
@@ -398,7 +408,10 @@ bool	xpm_check(t_mdata *d, void *mlx)
 static bool	rgb(char **s, unsigned *r, unsigned *g, unsigned *b)
 {
 	if (s == NULL)
-		return (false);
+		return (err_msg("rgb_to_hex split fail"));
+	if (s[0] == NULL || s[1] == NULL || s[2] == NULL ||\
+		*s[0] == ',' || *s[1] == ',' || *s[2] == ',')
+		return (free_split(s, 0), err_msg("Colors missing or empty values"));
 	*r = ft_atoi(s[0]);
 	*g = ft_atoi(s[1]);
 	*b = ft_atoi(s[2]);
@@ -412,12 +425,12 @@ bool	rgb_to_hex(t_mdata *d)
 	unsigned int	b;
 
 	if (!rgb(ft_split(d->tex[F], ','), &r, &g, &b))
-		return (err_msg("rgb_to_hex floor split fail"));
+		return (false);
 	if (b > 255 || g > 255 || r > 255)
 		return (err_msg("Floor values too high"));
 	d->col[0] = (r << 16) | (g << 8) | b;
 	if (!rgb(ft_split(d->tex[C], ','), &r, &g, &b))
-		return (err_msg("rgb_to_hex floor split fail"));
+		return (false);
 	if (b > 255 || g > 255 || r > 255)
 		return (err_msg("Floor values too high"));
 	d->col[1] = (r << 16) | (g << 8) | b;
@@ -464,8 +477,8 @@ int	start_renderer(t_mdata *fdata)
 
 /*			initialization				*/
 	d.mlx = mlx_init();
-	//if (!xpm_check(fdata, d.mlx))
-	//	return (err_msg("Bad textures"), mlx_destroy_display(d.mlx), free(d.mlx),free(d.i),free(d.i3D),free(d.k), -1);
+	if (!xpm_check(fdata, d.mlx))
+		return (err_msg("Bad textures"), mlx_destroy_display(d.mlx), free(d.mlx),free(d.i),free(d.i3D),free(d.k), -1);
 	if (!col_check(fdata))
 		return (mlx_destroy_display(d.mlx), free(d.mlx), free(d.i),free(d.i3D),free(d.k), -1);
 	d.win = mlx_new_window(d.mlx, WIDTH, HEIGHT, "window");
@@ -478,6 +491,6 @@ int	start_renderer(t_mdata *fdata)
 
 	mlx_loop(d.mlx);
 /*				clean up				*/
-	destroyAll(&d);
+	destroyAll(&d, fdata);
 	return (0);
 }
