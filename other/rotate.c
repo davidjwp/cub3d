@@ -113,11 +113,22 @@ void rotate_line(t_data *data) {
     if (data->angle >= 360.0) data->angle = 0.0;
 }
 
+void    drawdots(t_data *data)
+{
+    for (int i =0; i < 4; i++)
+        for (int y=0; y < 4; y++)
+            my_mlx_pixel_put(data, data->x0 + y + i, data->y0 + y + i, 0x00FFFF00);
+    for (int i =0; i < 4; i++)
+        for (int y=0; y < 4; y++)
+            my_mlx_pixel_put(data, data->x1 + y + i, data->y1 + y + i, 0x00FFFF00);
+}
+
 int loop_hook(void *param) {
     t_data *data = param;
     rotate_line(data);
     draw_line(data);
-	swap_buffers(data);
+    //drawdots(data);
+	//swap_buffers(data);
     return (0);
 }
 

@@ -6,132 +6,56 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/19 18:07:46 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/30 21:00:11 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/02/04 20:11:54 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/cub3d.h"
 
-/*
-*	Checks for spaces and tabs before the textures and colors then trims tabs
-*	and spaces off the end of the string.
-*
-*	Returns a boolean value
-*/
-static bool	trim(t_mdata *md)
+static int	linelen(char *line)
 {
-	void	*tmp;
-	int		i;
-
-	i = -1;
-	while (md->tex[++i] != NULL)
-		if (*md->tex[i] == ' ' || *md->tex[i] == '\t')
-			return (false);
-	i = 0;
-	while (md->tex[i] != NULL)
-	{
-		tmp = md->tex[i];
-		md->tex[i] = ft_strtrim((md->tex[i]), " \t");
-		if (!md->tex[i])
-			return (md->tex[i] = tmp, err_msg("trim malloc fail"), false);
-		free(tmp);
-		i++;
-	}
-	return (true);
-}
-
-//compares the line with the texture id
-static bool	texcol(int *pos, t_mdata *fd, int y, char **tex)
-{
-	*pos = 0;
-	while (tex[*pos] != NULL)
-	{
-		if (!ft_strncmp(fd->map[y], tex[*pos], ft_strlen(tex[*pos])))
-			return (fd->tc_index[*pos] = y, true);
-		*pos += 1;
-	}
-	return (false);
-}
-
-const char	*begtex(const char *s)
-{
+	int	len;
 	int	i;
 
 	i = -1;
-	while (s[++i])
-		if (s[i] != 9 && s[i] != 32)
-			return (&s[i]);
-	return (s);
-}
-
-bool	order(char **tex)
-{
-	int		i;
-	bool	s;
-
-	i = 7;
-	s = false;
-	while (--i)
+	len = 0;
+	while (line[++i])
 	{
-		if (tex[i] != NULL)
-			s = true;
-		if (tex[i] == NULL && s)
-			return (err_msg("Bad texture order"));
+		if (line[i] == '\t')
+			len += 4;
+		else
+			len++;
 	}
-	return (true);
+	return (len);
 }
-//the textures and colors and store them in the structure
-bool	texcol_check(t_mdata *fd, int i, int y)
-{
-	char	*tex[5];
-	int		pos;
 
-	while (++i < 7)
-		tex[i] = (char *[7]){"NO", "SO", "WE", "EA", "F ", \
-		"C ", NULL}[i];
-	y = 0;
-	while (fd->map[y])
-	{
-		if (!order(fd->tex))
-			break ;
-		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos <= 3)
-			fd->tex[pos] = ft_strdup(begtex(&fd->map[y][0] + 2));
-		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos > 3)
-			fd->tex[pos] = ft_strdup(begtex(&fd->map[y][0] + 1));
-		y++;
-	}
-	if (is_full(fd->tex))
-		return (trim(fd));
-	return (false);
-}
-////checks for the textures and colors and store them in the structure
-/*
-bool	texcol_check(t_mdata *fd, int i, int y)
+static void	linecpy(char *dst, const char *src, size_t size)
 {
-	char	*tex[5];
-	int		pos;
+	unsigned int	i;
+	unsigned int	y;
+	int				tab;
 
-	while (++i < 7)
-		tex[i] = (char *[7]){"NO", "SO", "WE", "EA", "F ", \
-		"C ", NULL}[i];
-	y = 0;
-	while (fd->map[y])
+	i = 0;
+	y = i;
+	if (!src || !dst)
+		return ;
+	if (size)
 	{
-		if (!order(fd->tex))
-			break ;
-		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos <= 3)
-			ft_strlcpy(fd->tex[pos], begtex(&fd->map[y][0] + 2), \
-			ft_strlen(begtex(&fd->map[y][0] + 2) + 1));
-		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos > 3)
-			ft_strlcpy(fd->tex[pos], begtex(&fd->map[y][0] + 1), \
-			ft_strlen(begtex(&fd->map[y][0] + 1)) + 1);
-		y++;
+		while (src[i] != '\0' && i < size - 1)
+		{
+			if (src[i] == '\t')
+			{
+				tab = 4;
+				while (tab--)
+					dst[y++] = ' ';
+				i++;
+			}
+			else
+				dst[y++] = src[i++];
+		}
+		dst[y] = '\0';
 	}
-	if (is_full(fd->tex))
-		return (trim(fd));
-	return (false);
 }
-*/
 
 /*
 	create the map in fdata
@@ -156,13 +80,11 @@ bool	cr_map(t_mdata *fdata)
 	tmp[len - 1] = NULL;
 	while (--len)
 	{
-		tmp[++i] = malloc(sizeof(char) * (ft_strlen(fdata->map[p.y]) + 1));
+		tmp[++i] = malloc(sizeof(char) * (linelen(fdata->map[p.y]) + 1));
 		if (!tmp[i])
 			return (free_split(tmp, i), err_msg("cr_map index malloc fail"));
-		ft_strlcpy(tmp[i], fdata->map[p.y], ft_strlen(fdata->map[p.y]) + 1);
+		linecpy(tmp[i], fdata->map[p.y], linelen(fdata->map[p.y]) + 1);
 		p.y++;
 	}
-	free_split(fdata->map, 0);
-	fdata->map = tmp;
-	return (true);
+	return (free_split(fdata->map, 0), fdata->map = tmp, true);
 }

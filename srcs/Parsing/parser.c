@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/14 20:21:47 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/30 15:33:53 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/02/02 22:22:21 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,13 +113,8 @@ bool	is_open(t_mdata *fdata)
 	return (true);
 }
 
-bool	file_parse(char **split, const char *file_name, t_mdata *fdata)
+bool	file_parse(t_mdata *fdata)
 {
-	if (split == NULL)
-		return (err_msg("split fail"));
-	fdata->map = split;
-	if (ft_strncmp(ft_strchr(file_name, '.'), ".cub", 5))
-		return (err_msg("Bad extension"));
 	if (!texcol_check(fdata, -1, 0))
 		return (err_msg("Bad texcol"));
 	if (!cr_map(fdata))

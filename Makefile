@@ -6,7 +6,7 @@
 #    By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/16 14:07:50 by djacobs           #+#    #+#              #
-#    Updated: 2024/01/29 17:13:05 by djacobs          ###   ########.fr        #
+#    Updated: 2024/02/06 21:52:13 by djacobs          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,13 +33,23 @@ SRCS		:=	srcs/main.c \
 				srcs/Parsing/Parser_utilsC.c \
 				srcs/Parsing/cr_map.c \
 				srcs/Parsing/cr_nodes.c \
+				srcs/Parsing/texcol_check.c \
+				srcs/Renderer/controls/hook_functions.c \
+				srcs/Renderer/controls/exit_game.c \
+				srcs/Renderer/controls/move_player.c \
+				srcs/Renderer/controls/rotate_player.c \
+				srcs/Renderer/get_texcol.c \
+				srcs/Renderer/Renderer_utilsA.c \
+				srcs/Renderer/minimap.c \
+				srcs/Renderer/raycast.c \
 				srcs/Prints.c \
-				renderer.c
+				new_renderer.c
 
 OBJ_DIR		:= obj/
 OBJS		:= $(SRCS:%.c=$(OBJ_DIR)%.o)
 
-all: $(NAME)
+
+all: $(NAME) 
 
 $(NAME): $(OBJS) $(LIBFT) $(MIN_LIBX)
 	$(CC) $(CFLAGS) $(OBJS) $(MLX) $(LIBFT) $(LINKER)  -o $(NAME)
@@ -50,6 +60,9 @@ $(OBJ_DIR)%.o: %.c $(HEADER)
 
 $(LIBFT):
 	make -C $(LIBFT_DIR)
+
+$(MIN_LIBX):
+	make -C ./minilibx-linux/
 
 clean:
 	rm -fr $(OBJ_DIR)

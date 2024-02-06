@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/16 14:03:39 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/30 15:49:48 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/02/06 17:16:19 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,16 @@ static bool	find_char(t_mdata *fdata, t_pos *p, int hp)
 	while ((&fdata->map[hp])[++p->y] != NULL)
 	{
 		if (l_ismap((&fdata->map[hp])[p->y]))
+		{
 			while ((&fdata->map[hp])[p->y][++p->x])
+			{
 				if (ischar((&fdata->map[hp])[p->y][p->x]))
+				{
+					fdata->pl_sp_dir = (&fdata->map[hp])[p->y][p->x];
 					return (p->y += hp, true);
+				}
+			}
+		}
 		p->x = -1;
 	}
 	return (false);

@@ -6,30 +6,29 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/17 16:17:57 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/29 18:18:34 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/02/05 15:27:19 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
 //test print for printing the char** map
-/*
+
 void	print_map(char **split)
 {
 	for(int y = 0, i = 0; split[y]; y++){
 		for(; split[y][i]; i++)
-			split[y][i] == '\t'?write(1,"    ",4):write (1, &split[y][i], 1);
+			write (1, &split[y][i], 1);
 		i = 0;
 		if (split[y][i] != '\n')
 			write (1, "\n", 1);
 	}	
 }
-*/
 
 static void	_pnode(t_n node)
 {
 	if (node.c)
-		write (1, "\033[103m \033[0m", 11);
+		write (1, "\033[101m \033[0m", 11);
 	else if (node.visited)
 		write (1, "\033[102m \033[0m", 11);
 	else if (node.s)
@@ -94,7 +93,7 @@ void	tty_print(t_mdata *f, t_lst *l, t_n *c, int i)
 		sleep_time = 1000000000 / area;
 	else
 		sleep_time = 1000000000 / 1;
-	max_sleep_time = 40000;
+	max_sleep_time = 5000;
 	if (sleep_time > max_sleep_time)
 		sleep_time = max_sleep_time;
 	usleep((useconds_t)sleep_time);
