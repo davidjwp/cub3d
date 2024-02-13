@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   move_player.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ael-malt <ael-malt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 18:36:37 by ael-malt          #+#    #+#             */
-/*   Updated: 2024/02/06 22:28:52 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/02/12 11:25:11 by ael-malt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../include/cub3d.h"
 
-void	upkey(t_mlx *d, t_ray *r)
+static void	upkey(t_mlx *d, t_ray *r)
 {
 	if (d->map[(int)(r->pos.y + r->dir.y * MS)][(int)r->pos.x] != '1')
 		r->pos.y += r->dir.y * MS;
@@ -20,7 +20,7 @@ void	upkey(t_mlx *d, t_ray *r)
 		r->pos.x += r->dir.x * MS;
 }
 
-void	downkey(t_mlx *d, t_ray *r)
+static void	downkey(t_mlx *d, t_ray *r)
 {
 	if (d->map[(int)(r->pos.y - r->dir.y * MS)][(int)r->pos.x] != '1')
 		r->pos.y -= r->dir.y * MS;
@@ -28,7 +28,7 @@ void	downkey(t_mlx *d, t_ray *r)
 		r->pos.x -= r->dir.x * MS;
 }
 
-void	rightkey(t_mlx *d, t_ray *r)
+static void	rightkey(t_mlx *d, t_ray *r)
 {
 	double	pl_dir;
 
@@ -41,7 +41,7 @@ void	rightkey(t_mlx *d, t_ray *r)
 		r->pos.x += cos(pl_dir + M_PI_2) * MS;
 }
 
-void	leftkey(t_mlx *d, t_ray *r)
+static void	leftkey(t_mlx *d, t_ray *r)
 {
 	double	pl_dir;
 
@@ -52,4 +52,22 @@ void	leftkey(t_mlx *d, t_ray *r)
 	if (d->map[(int)r->pos.y][(int)(r->pos.x + \
 	cos(pl_dir - M_PI_2) * MS)] != '1')
 		r->pos.x += cos(pl_dir - M_PI_2) * MS;
+}
+
+int	buttons(t_mlx *d)
+{
+	if (d->k->w)
+		upkey(d, &d->r);
+	if (d->k->s)
+		downkey(d, &d->r);
+	if (d->k->d)
+		rightkey(d, &d->r);
+	if (d->k->a)
+		leftkey(d, &d->r);
+	if (d->k->ra)
+		rotate_right(&d->r);
+	if (d->k->la)
+		rotate_left(&d->r);
+	raycast(d, &d->r);
+	return (0);
 }

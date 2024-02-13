@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cr_nodes.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ael-malt <ael-malt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 20:25:03 by djacobs           #+#    #+#             */
-/*   Updated: 2024/01/29 16:44:29 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/02/12 10:58:03 by ael-malt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	free_nodes(t_n **nodes, t_pos mlw, int index)
 		{
 			free(nodes[index]);
 			index--;
-		}	
+		}
 	}
 	free(nodes);
 	nodes = NULL;

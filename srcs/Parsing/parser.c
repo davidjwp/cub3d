@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/14 20:21:47 by djacobs           #+#    #+#             */
-/*   Updated: 2024/02/02 22:22:21 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/02/10 16:35:33 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ bool	is_open(t_mdata *fdata)
 		current->visited = true;
 		rm_visited(&l);
 		if (!av_node(&l, fdata->m_nodes, current, fdata->mlw))
-			return (tty_print(fdata, l, current, i++), free_lst(l));
+			return (tty_print(fdata, NULL, current, i++), free_lst(l));
 		tty_print(fdata, l, current, i++);
 	}
 	free_lst(l);

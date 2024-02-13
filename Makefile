@@ -6,7 +6,7 @@
 #    By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/16 14:07:50 by djacobs           #+#    #+#              #
-#    Updated: 2024/02/06 21:52:13 by djacobs          ###   ########.fr        #
+#    Updated: 2024/02/12 14:59:43 by djacobs          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ NAME		:= cub3D
 CC			:= gcc
 CFLAGS		:= -g3 -Wall -Werror -Wextra
 
-INC_DIR		:= -Iinclude -I ./minilibx-linux
+INC_DIR		:= -Iinclude -I ./minilibx-linux 
 MLX			:= -L./minilibx-linux
 MIN_LIBX	= ./minilibx-linux/libmlx_Linux.a ./minilibx-linux/libmlx.a
 
@@ -41,9 +41,11 @@ SRCS		:=	srcs/main.c \
 				srcs/Renderer/get_texcol.c \
 				srcs/Renderer/Renderer_utilsA.c \
 				srcs/Renderer/minimap.c \
+				srcs/Renderer/raycalc_utils.c \
 				srcs/Renderer/raycast.c \
+				srcs/Renderer/inits.c \
+				srcs/Renderer/renderer.c \
 				srcs/Prints.c \
-				new_renderer.c
 
 OBJ_DIR		:= obj/
 OBJS		:= $(SRCS:%.c=$(OBJ_DIR)%.o)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   hook_functions.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ael-malt <ael-malt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 14:30:37 by ael-malt          #+#    #+#             */
-/*   Updated: 2024/02/06 22:24:57 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/02/07 12:56:56 by ael-malt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	key_press(int key, void *param)
 
 	d = (t_mlx *)param;
 	if (key == XK_Escape)
-		return (close_win(key, param), 0);
+		return (close_win(param), 0);
 	if (key == 'w')
 		d->k->w = true;
 	if (key == 'a')

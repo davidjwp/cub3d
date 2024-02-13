@@ -6,11 +6,13 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:31:49 by djacobs           #+#    #+#             */
-/*   Updated: 2024/02/06 20:32:21 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/02/10 16:40:05 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/cub3d.h"
+
+//valgrind --leak-check=full --show-leak-kinds=all --suppressions=minimal.supp
 
 bool	mdata_init(t_mdata *md, char *filename)
 {

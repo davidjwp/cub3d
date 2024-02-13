@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/04 18:46:18 by djacobs           #+#    #+#             */
-/*   Updated: 2024/02/06 21:15:47 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/02/12 20:45:55 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,22 +64,22 @@ static const char	*begtex(const char *s)
 	return (s);
 }
 
-static bool	order(char **tex)
-{
-	int		i;
-	bool	s;
+//static bool	order(char **tex)
+//{
+//	int		i;
+//	bool	s;
 
-	i = 7;
-	s = false;
-	while (--i)
-	{
-		if (tex[i] != NULL)
-			s = true;
-		if (tex[i] == NULL && s)
-			return (err_msg("Bad texture order"));
-	}
-	return (true);
-}
+//	i = 7;
+//	s = false;
+//	while (--i)
+//	{
+//		if (tex[i] != NULL)
+//			s = true;
+//		if (tex[i] == NULL && s)
+//			return (err_msg("Bad texture order"));
+//	}
+//	return (true);
+//}
 
 //the textures and colors and store them in the structure
 bool	texcol_check(t_mdata *fd, int i, int y)
@@ -90,14 +90,15 @@ bool	texcol_check(t_mdata *fd, int i, int y)
 	while (++i < 7)
 		tex[i] = (char *[7]){"NO", "SO", "WE", "EA", "F ", \
 		"C ", NULL}[i];
-	y = 0;
 	while (fd->map[y])
 	{
-		if (!order(fd->tex))
-			break ;
-		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos <= 3)
+		//if (!order(fd->tex))
+		//	break ;
+		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos <= 3 && \
+		!fd->tex[pos])
 			fd->tex[pos] = ft_strdup(begtex(&fd->map[y][0] + 2));
-		if (!is_full(fd->tex) && texcol(&pos, fd, y, tex) && pos > 3)
+		if (!is_full(fd->tex) && texcol(&	pos, fd, y, tex) && pos > 3 && \
+		!fd->tex[pos])
 			fd->tex[pos] = ft_strdup(begtex(&fd->map[y][0] + 1));
 		y++;
 	}

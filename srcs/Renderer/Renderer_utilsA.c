@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/06 20:58:40 by djacobs           #+#    #+#             */
-/*   Updated: 2024/02/06 21:05:48 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/02/12 15:01:56 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 bool	outmap(t_pos start, t_minline mini)
 {
-	if (start.x <= mini.limitx.x || \
-		start.x >= mini.limitx.y || \
-		start.y <= mini.limity.x || \
-		start.y >= mini.limity.y)
+	if (start.x < mini.limitx.x || \
+		start.x >= mini.limitx.y - 1 || \
+		start.y < mini.limity.x || \
+		start.y >= mini.limity.y - 1)
 		return (true);
 	return (false);
 }

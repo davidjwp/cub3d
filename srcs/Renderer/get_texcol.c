@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/06 20:40:13 by djacobs           #+#    #+#             */
-/*   Updated: 2024/02/06 20:49:57 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/02/12 20:36:35 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 
 static void	xpm_getaddr(t_mlx *m)
 {
-	mlx_get_data_addr(m->xpms[NO].img, \
+	m->xpms[NO].add = mlx_get_data_addr(m->xpms[NO].img, \
 	&m->xpms[NO].bpp, &m->xpms[NO].len, &m->xpms[NO].end);
-	mlx_get_data_addr(m->xpms[SO].img, \
+	m->xpms[SO].add = mlx_get_data_addr(m->xpms[SO].img, \
 	&m->xpms[SO].bpp, &m->xpms[SO].len, &m->xpms[SO].end);
-	mlx_get_data_addr(m->xpms[WE].img, \
+	m->xpms[WE].add = mlx_get_data_addr(m->xpms[WE].img, \
 	&m->xpms[WE].bpp, &m->xpms[WE].len, &m->xpms[WE].end);
-	mlx_get_data_addr(m->xpms[EA].img, \
+	m->xpms[EA].add = mlx_get_data_addr(m->xpms[EA].img, \
 	&m->xpms[EA].bpp, &m->xpms[EA].len, &m->xpms[EA].end);
 }
 
@@ -44,7 +44,7 @@ bool	xpm_check(t_mdata *d, t_mlx *m, void *mlx)
 	if (m->xpms[EA].img == NULL)
 		return (mlx_destroy_image(mlx, m->xpms[NO].img), \
 		mlx_destroy_image(mlx, m->xpms[SO].img), \
-		mlx_destroy_image(mlx, m->xpms[EA].img), false);
+		mlx_destroy_image(mlx, m->xpms[WE].img), false);
 	xpm_getaddr(m);
 	return (true);
 }

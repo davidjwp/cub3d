@@ -1,0 +1,15 @@
+NO ./assets/wall1.xpm
+SO ./assets/stone2.xpm
+WE ./assets/wall2.xpm
+EA ./assets/wood.xpm
+
+F 79, 59, 51
+C 74,129,148
+
+   1111
+  100001
+ 10000001
+10000E0001
+ 10000001
+  100001
+   1111

@@ -1,9 +1,9 @@
 NO srcs/xpms/North.xpm
 SO srcs/xpms/South.xpm
 WE srcs/xpms/West.xpm
-EA srcs/xpms/East.xpm							     
+C 201,204,251				      	 	
 F 0116,   0000150 3,80,,,,,	,
-C 201,204,251				  	 	
+EA srcs/xpms/East.xpm
 
 
 

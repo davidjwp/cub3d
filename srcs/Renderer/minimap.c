@@ -6,7 +6,7 @@
 /*   By: djacobs <djacobs@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/06 20:55:48 by djacobs           #+#    #+#             */
-/*   Updated: 2024/02/06 22:23:33 by djacobs          ###   ########.fr       */
+/*   Updated: 2024/02/10 18:33:08 by djacobs          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ static void	miniline(t_mlx *d, t_pos start, t_ray *r, t_minline *m)
 {
 	while (1)
 	{
-		m->map = (t_pos){(r->pos.x + (start.x - m->or.x) * SCALE), \
-			(r->pos.y + (start.y - m->or.y) * SCALE)};
+		m->map = (t_pos){abs((int)(r->pos.x + (start.x - m->or.x) * SCALE)), \
+			abs((int)(r->pos.y + (start.y - m->or.y) * SCALE))};
 		if (m->map.y < d->mxy.y && m->map.x < (int)ft_strlen(d->map[m->map.y]))
 			m->world = (t_pos){m->map.x, m->map.y};
 		pixput(d->i, start.x, start.y, MINRAY);
